@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI DetectorZPlaneMem
+#   memory efficient detector class for incoherent sources (orthogonal to
+#   z-axis).
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
 #include "DetectorZPlaneMem.h"
 
 #include "xgi_global_variables.h"
@@ -73,8 +105,6 @@ bool DetectorZPlaneMem::ApplyOpticalElementRule()
 
 				unsigned int nPixelAddress = floor(fXPositionOnDetector/m_f_TotalSignal_DeltaX) + floor(fYPositionOnDetector/m_f_Totalsignal_DeltaY) * m_nNxTotalSignal;
 				PixelSignal PathSignal(fRealPart, fImaginaryPart);
-				//It appears that one can not use emplace() with gcc 447
-				//pair<map<unsigned int, PixelSignal>::iterator, bool> pPixelToWriteOn = m_mHistorySignal.emplace(nPixelAddress, a);
 
 				//Add a new pixel to the history signal if that pixel didn't already receive some signal from the current history...
 				pair<std::unordered_map<unsigned int, PixelSignal>::iterator, bool> pPixelToWriteOn = m_mHistorySignal.insert(std::pair<unsigned int, PixelSignal>(nPixelAddress, PathSignal));
@@ -152,8 +182,7 @@ void DetectorZPlaneMem::ReportOpticalElement()
 void DetectorZPlaneMem::WriteOnFile(long int i_nLastCase)
 {
 	//Setup the binary file
-
-	//try saving it in m_sPath if m_sPath != 0
+	//try saving it in m_sPath
 	bool bBinaryFileIsOpen = false;
 	std::string BinaryFileName;
 	std::fstream BinarySignalFile;
@@ -173,7 +202,6 @@ void DetectorZPlaneMem::WriteOnFile(long int i_nLastCase)
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlaneMem::WriteOnFile: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -192,7 +220,6 @@ void DetectorZPlaneMem::WriteOnFile(long int i_nLastCase)
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlaneMem::WriteOnFile: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -281,7 +308,6 @@ void DetectorZPlaneMem::WriteToFileNumberOfPaths()
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlaneMem::WriteToFileNumberOfPaths: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -300,7 +326,6 @@ void DetectorZPlaneMem::WriteToFileNumberOfPaths()
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlaneMem::WriteToFileNumberOfPaths: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -359,7 +384,6 @@ void DetectorZPlaneMem::CreateImage()
 	if(fTheMaxValue > 0.0)
 	{
 		//Image header
-		//std::cout << "DetectorZPlaneMem::CreateImage::fTheMaxValue: " << fTheMaxValue << std::endl;
 		ofstream Image;
 
 		bool bImageFileIsOpen = false;
@@ -377,7 +401,6 @@ void DetectorZPlaneMem::CreateImage()
 			if(!bImageFileIsOpen)
 			{
 				//Failed to open the file.
-				//maybe the path doesn't exist or don't have permission
 				//try other location
 				std::cout << "DetectorZPlaneMem::CreateImage: Warning unable to open file: " << name << std::endl;
 			}
@@ -395,7 +418,6 @@ void DetectorZPlaneMem::CreateImage()
 			if(!bImageFileIsOpen)
 			{
 				//Failed to open the file.
-				//maybe the path doesn't exist or don't have permission
 				//try other location
 				std::cout << "DetectorZPlaneMem::CreateImage: Warning unable to open file: " << name << std::endl;
 			}
@@ -437,7 +459,7 @@ void DetectorZPlaneMem::CreateImage()
 void DetectorZPlaneMem::EndRayTracing()
 {
 	EGS_Float fNormalizationConstant = 1.0;
-	//The summing over paths is only allowed to shift intensity to another place. The over all intensity on the detector has to remain the same
+	//The sum over paths is only allowed to shift intensity to another location. Reduction of (integrated) intensity can only be reduced by attenuation.
 	if(m_bDoHistoryWiseNormalization == true && m_bDoNumberOfPathsNormalization == false)
 	{
 		EGS_Float fTotalSignalGeneratedInThisHistory = 0.0;
@@ -670,7 +692,7 @@ int DetectorZPlaneMem::InitOpticalElement(EGS_Input* i_sInput, EGS_BaseGeometry*
 		m_f_Totalsignal_DeltaY = m_fHeight/m_nNyTotalSignal;
 
 
-		//Setup the signal arrays with 0 entries
+		//Setup the signal arrays
 		m_pTotalSignal = new std::vector<double> (m_nNxTotalSignal*m_nNyTotalSignal, 0.0);
 		if(m_bCountNumberOfPaths == true)
 		{
@@ -678,7 +700,7 @@ int DetectorZPlaneMem::InitOpticalElement(EGS_Input* i_sInput, EGS_BaseGeometry*
 		}
 
 
-		if(nForBoolWirteToBinary[0] == 0)//c++ convention
+		if(nForBoolWirteToBinary[0] == 0)
 		{
 			m_bWirteToBinary = false;
 		}
@@ -713,8 +735,6 @@ void DetectorZPlaneMem::EndSimulation(int i_nNumberOfHistories)
 	{
 		WriteToFileNumberOfPaths();
 	}
-	//std::cout << "DetectorZPlaneMem::EndSimulation(): scored primary paths: " << m_nNumberOfTimesApplied << std::endl;
-	//std::cout << "DetectorZPlaneMem::EndSimulation(): scored secondary paths: " << m_nNumberOfSecondaryParticles << std::endl;
 }
 
 
