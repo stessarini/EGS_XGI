@@ -23,3 +23,6 @@ mortjob.mortran
 *.bin
 *.att
 *.npy
+
+#ignore EGSnrc input files
+*.egsinp
