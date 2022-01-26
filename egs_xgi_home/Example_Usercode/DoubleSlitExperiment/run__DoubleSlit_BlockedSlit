@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export EGS_HOME=/path/to/egs_xgi_home/
+#if not using default:
+export HEN_HOUSE=/path/to//HEN_HOUSE/
+export EGS_CONFIG=/path/to/config/file
+export my_machine=my_machine_name
+
+n=100000
+
+cd ..
+the_dir=./DoubleSlitExperiment/
+input0=DoubleSlit_d2em4_a2em5_CohPointSource_OneBlockedSlit
+mv $the_dir"/"$input0".egsinp" .
+../bin/$my_machine/Example_Usercode -p 521icru -i $input0 -r PolystyreneSpheres -n $n > $the_dir"/out_"$input0".txt"
+mv $input0".egsinp" $the_dir
+
+exit 0
