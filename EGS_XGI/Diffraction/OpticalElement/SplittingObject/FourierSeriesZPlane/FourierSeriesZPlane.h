@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI FourierSeriesZPlane header
+#   Model phase gratings (orthogonal to z-axis) with Fourier series
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
+
 #ifndef _FOURIERSERIESZPLANE_H_
 #define _FOURIERSERIESZPLANE_H_
 
@@ -9,9 +41,9 @@
 #include "RefractiveIndexCalculator.h"
 
 /*A class to simulate phase gratings.
-  Splits incomming paths into paths according to the Fourier series of the
-  transmission function. The argment of the Fourier coefficients gives the
-  cahnge of direction of the path.
+  Splits incoming paths into paths according to the Fourier series of the
+  transmission function. The argument of the Fourier coefficients gives the
+  change of direction of the path.
 
   Has modes selected by the boolean member variables:
   - 'm_bIncludeAttenuationInGrating'
@@ -25,7 +57,7 @@
 	  vector on the grating, both with unit length :
 	  $\left|\hat{p}\right| = \left|\hat{n}\right| = 1$. In the case of a
 	  flat grating 'fDirectionCorrection' = 1.0/the_stack->w[.].
-  The two functionalities can be switchen on and off independently of each other.
+  The two functionalities are independent of each other.
   Energy dependence of the phase shift is aways taken into account.
 
   The Fourier series is split into two parts an energy independent part
@@ -50,15 +82,15 @@ public:
 	virtual void ReportOpticalElement();
 	virtual void PrintSummary();
 
-	/*Some part of the Fourier coefficeints needed for the splitting is energy dependent.
-	  This part can be reused in all the splittings conserning the same history. This function
-	  informs the grating that next time a splitting occurs the coefficients have to be
-	  recalculated.*/
+	/*Some part of the Fourier coefficients needed for the splitting is energy dependent.
+		  This part can be reused in all the splittings concerning the same history. This function
+		  informs the grating that next time a splitting occurs the coefficients have to be
+		  recalculated.*/
 	virtual void EndRayTracing();
 
-	/* When first asked to split the incomming path: Calculate the energy dependent part of the Fourier coefficients
-	   to enable faster transport. Once done set a flag that tells the grating to reuse
-	   the calculated coefficients*/
+	/* When first asked to split the incoming path: Calculate the energy dependent part of the Fourier coefficients
+		   to enable faster transport. Once done set a flag that tells the grating to reuse
+		   the calculated coefficients*/
 	virtual void StartRayTracing(EGS_Float& i_fEnergy);
 
 	/*Setup and calculate the history independent part of the Fourier coefficients
@@ -74,7 +106,7 @@ private:
 	EGS_Float m_fPeriodinCM;
 	EGS_Float m_fPhaseShiftAtDesignEnergyInUnitsOfPi;
 	//Assume quadratic dependence of phase shift
-	//Hence use the following constnats to determine the phase shift for different energies
+	//Hence use the following constants to determine the phase shift for different energies
 	/*It is assumed that the input specifies the relative phase shift of the grating sections.
 	  (additional phase shift in section a)*/
 	EGS_Float m_PhaseConstantTransmissionFunctionA;
@@ -88,7 +120,7 @@ private:
 	int m_nMediumIndexGaps; //Media in which the grating is embedded 'b'
 	EGS_Interpolator* i_gmfp;//EGS interpolator for attenuation coefficients
 	/*In case one is not taking into account attenuation inside grating slabs,
-	still want to be able to set a default value for the transmission function.
+	set a default value for the transmission function.
 	In that case the Norm of the transmission function is saved in the following
 	two members*/
 	EGS_Float m_fNormTransmissionFunctionA;
@@ -114,10 +146,10 @@ private:
 	bool m_bInclude_Coefficient_0;
 	bool m_bHavePrecalculatedCoefficients;
 
-	//Flag for dependence of transmission function on direction of incomming path
+	//Flag for dependence of transmission function on direction of incoming path
 	bool m_bDirectionCorrectionGratingThickness;
 
-	//Numerical constant for setting the flags to include the different terms
+	//Numerical constant
 	EGS_Float m_fEpsilon;
 
 	unsigned int m_nNumberOfSecondaryPhotons;
@@ -125,16 +157,8 @@ private:
 
 
 
-	//
-	//
-
-
 	int m_nHighestFourierCoefficient;
   RefractiveIndexCalculator* m_pRefractiveIndexCalculator;
 };
 
-#endif/*
-
-
-
-*/
+#endif

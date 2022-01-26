@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI FourierSeriesZPlane
+#   Model phase gratings (orthogonal to z-axis) with Fourier series
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
+
 #include "FourierSeriesZPlane.h"
 #include "xgi_global_variables.h"
 #include "egs_interface2.h"
@@ -67,11 +99,6 @@ bool FourierSeriesZPlane::ApplyOpticalElementRule()
 		fDirection.z = the_stack->w[m_nStackSizeBefore];
 		fDirection.normalize();
 		//only split:
-		/*
-		- primary
-		- photon paths
-		- not leaving the simulation geometry
-		- are not orthogonal to z-axis (also make sure that the argument of sqrt (see below) is larger than 0)*/
 		if(e_bPrimary[m_nStackSizeBefore] == true && nir_Before > 1 && nCharge == 0 && abs(fDirection.z) > 0.5 )
 		{
 			EGS_Float fEnergyBefore = the_stack->E[m_nStackSizeBefore];
@@ -87,18 +114,13 @@ bool FourierSeriesZPlane::ApplyOpticalElementRule()
 
 			EGS_Float fwt_before = the_stack->wt[m_nStackSizeBefore];
 
-			//EGS_Float fu_Before = the_stack->u[m_nStackSizeBefore];
-			//EGS_Float fv_Before = the_stack->v[m_nStackSizeBefore];
-
 			EGS_Float fx_Before = the_stack->x[m_nStackSizeBefore];
 			EGS_Float fy_Before = the_stack->y[m_nStackSizeBefore];
 
 			EGS_Float fdnear_Before = the_stack->dnear[m_nStackSizeBefore];
 
-			//EGS_I32 nir_Before = the_stack->ir[m_nStackSizeBefore];
 			EGS_I32 nlatch_Berfore = the_stack->latch[m_nStackSizeBefore];
 
-			//A counter to keep track of which the_stack address to use during the splitting
 			unsigned int nNumberOfCreatedPaths = 0;
 			//Add all paths with relevant weight (Fourier coefficient) to the_stack
 			if (m_bInclude_Coefficient_0 == true)
@@ -142,7 +164,7 @@ bool FourierSeriesZPlane::ApplyOpticalElementRule()
 			}
 			the_stack->np = m_nStackSizeBefore + nNumberOfCreatedPaths;
 
-			m_nSplittingNumber = nNumberOfCreatedPaths;
+			//m_nSplittingNumber = nNumberOfCreatedPaths;
 			m_nNumberOfTimesApplied++;
 			m_nNumberOfGeneratedPaths += nNumberOfCreatedPaths;
 
@@ -177,12 +199,12 @@ bool FourierSeriesZPlane::ApplyOpticalElementRule()
 				m_nNumberOfSecondaryPhotons++;
 				the_stack->wt[m_nStackSizeBefore] *= (m_fDutyCycle * m_fNormTransmissionFunctionA + (1.0 - m_fDutyCycle) * m_fNormTransmissionFunctionB);
 			}
-			m_nSplittingNumber = 1;
+			//m_nSplittingNumber = 1;
 			return true;
 		}
 		else//electron or positron
 		{
-			m_nSplittingNumber = 1;
+			//m_nSplittingNumber = 1;
 			m_nNumberOfChargedParticles++;
 			return true;
 		}
@@ -589,7 +611,7 @@ bool FourierSeriesZPlane::PermissionToResetPointer(int i_nStackSize)
 	else if(m_nStackSizeBefore >= i_nStackSize)
 	{
 		std::cout << "SplittingObject::PermissionToResetPointer: "<< m_sName << ": warning stack size too low: " << m_nStackSizeBefore << " > " << i_nStackSize << std::endl;
-		std::cout << "m_nSplittingNumber = " << m_nSplittingNumber << std::endl;
+		//std::cout << "m_nSplittingNumber = " << m_nSplittingNumber << std::endl;
 		std::cout << "latch: " << the_stack->latch[i_nStackSize] << std::endl;
 		std::cout << "x = " << the_stack->x[i_nStackSize] << std::endl;
 		std::cout << "y = " << the_stack->y[i_nStackSize] << std::endl;
