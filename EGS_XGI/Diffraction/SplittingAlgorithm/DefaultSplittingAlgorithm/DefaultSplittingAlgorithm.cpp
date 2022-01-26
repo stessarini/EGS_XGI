@@ -1,3 +1,34 @@
+/*
+###############################################################################
+#
+#   EGS_XGI DefaultSplittingAlgorithm
+#   Default interferometer class, managing splitting of the optics components
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
 #include "DefaultSplittingAlgorithm.h"
 
 
@@ -84,26 +115,24 @@ void DefaultSplittingAlgorithm::PotentialParameterReset()
 {
 	if(!(m_pLatestActiveSplittingObject == m_pSplittingObjects.end()))
 	{
-		//Check whether there are stil some split paths from m_pLatestActiveSplittingObject around
+		//Check whether there are stil some split paths from m_pLatestActiveSplittingObject to be processed
     while((m_pLatestActiveSplittingObject != m_pSplittingObjects.end()) && (*m_pLatestActiveSplittingObject)->PermissionToResetPointer(the_stack->np -1) )
     {
-    	m_pLatestActiveSplittingObject++;//Set the pointer to the OpticalElement before
+    	m_pLatestActiveSplittingObject++;//Set the pointer to the previous OpticalElement
     }
 	}
-	//else there is no need to reset since there hasn't been any path splitting
+	//else nothing to do
 }
 
 
 int DefaultSplittingAlgorithm::InitDerivedSplittingAlgorithm(EGS_Input* i_Input)
 {
 	std::vector<std::string> sSetup;
-	//std::vector<std::string> sMainDetector;//IMPORTANT: NEEDS to be the last detector
 	std::vector<std::string> sSourceCoherence;
 
 	int errSetup = i_Input->getInput("setup", sSetup);
-//	int errMainDet = i_Input->getInput("main detector", sMainDetector);
 	int errCoherence = i_Input->getInput("source coherence", sSourceCoherence);
-	//In case coherence is not set in the input file a warning should be shown and an incoherent source should be assumed
+	//In case coherence is not set in the input file a warning should be shown. In that case an incoherent source is assumed
 	if(errCoherence)
 	{
 		std::cout << "DefaultSplittingAlgorithm::InitDerivedSplittingAlgorithm: Error reading 'coherence'-key." << std::endl;
@@ -203,8 +232,7 @@ std::string DefaultSplittingAlgorithm::WhichOpticalElement()
   }
   else
   {
-    //there was no splitting.
-    return "source";
+    return "DefaultSplittingAlgorithm::source";
   }
 }
 

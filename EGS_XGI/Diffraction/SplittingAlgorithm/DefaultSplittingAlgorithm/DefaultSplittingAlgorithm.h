@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI DefaultSplittingAlgorithm header
+#   Default interferometer class, managing splitting of the optics components
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
+
 #ifndef _DEFAULTSPLITTINGALGORITHM_H_
 #define _DEFAULTSPLITTINGALGORITHM_H_
 #include <fstream>
@@ -8,7 +40,7 @@
 #include <string.h>
 
 #include "SplittingAlgorithm.h"
-//#include "SplittingObject.h"
+
 #include "egs_input.h"
 
 #include "egs_rndm.h"
@@ -21,16 +53,13 @@ public:
 	DefaultSplittingAlgorithm();
 
 	~DefaultSplittingAlgorithm();
-//Report relevant quantities of this and it's splitting planes
+
 	void ReportSplittingAlgorithm();
 
-//Report which splitting object splitted how many particles
 	void ReportSplittingSummary(int ncase);
 
-//Do a particle splitting if necessary, very often it will not be needed (when the particle already passed all spliting objects)
 	void PotentialParticleSplitting();
 
-//Reset Parameters if necessary
 	void PotentialParameterReset();
 
 	virtual void endHistory();
@@ -42,13 +71,10 @@ public:
 	virtual std::string WhichOpticalElement();
 
 	virtual int IsInInitialCondition();
-	
+
 protected:
 	//The last OpticalElement used for path splitting:
 	vector<OpticalElement*>::iterator m_pLatestActiveSplittingObject;
-	//THe last OpticalElement in the list (which is in reverse order i.e. m_SplittingObject.end() == m_pLatestActiveSplittingObject means that there are no clones around)
-	//vector<OpticalElement*>::iterator m_pLastSplittingObject;
-
 
 	bool m_bCoherentSource;
 
