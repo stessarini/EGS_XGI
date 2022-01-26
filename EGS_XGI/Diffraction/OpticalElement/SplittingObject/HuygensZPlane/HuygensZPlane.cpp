@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI HuygensZPlane
+#   Apply uniform path splitting on a plane orthogonal to z-axis with anglular
+#   restrictions.
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
 #include "HuygensZPlane.h"
 #include "xgi_global_variables.h"
 
@@ -40,13 +72,9 @@ bool HuygensZPlane::ApplyOpticalElementRule()
       EGS_Float fYPosition = the_stack->y[m_nStackSizeBefore];
       if(m_fYmin < fYPosition && fYPosition < m_fYmax)
       {
-        //path crosses *this
         EGS_I32 nRegionIndexBefore = the_stack->ir[m_nStackSizeBefore];
         if(e_bPrimary[m_nStackSizeBefore] == true && nRegionIndexBefore > 1 && the_stack->iq[m_nStackSizeBefore] == 0)
         {
-          //split primary photon that doesn't go into the void
-          //=>split
-
           //Get all parameters before the splitting event:
           EGS_Float fWeightAfterPathSplitting = the_stack->wt[m_nStackSizeBefore] / m_nSplittingNumber;
   				EGS_Float fPhaseBeforePathSplitting = e_fPhase[m_nStackSizeBefore];
@@ -66,7 +94,7 @@ bool HuygensZPlane::ApplyOpticalElementRule()
 
           for(int nPathCounter = 0; nPathCounter < m_nSplittingNumber; nPathCounter++)
           {
-            //generate new random direction mimicing Huygens principle
+            //generate new random direction
             //Assuming grating lines along y-direction, i.e., periodicity along x-direction
             //Get polar angle of new direction vector
             EGS_Float fPolarAngle = m_pRandomNumberGenerator->getUniform() * m_fRangePolarAngle + m_fSplittingAngleMin;
