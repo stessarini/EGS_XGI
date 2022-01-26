@@ -1,0 +1,25 @@
+#ignore EGSnrc specific files
+mortjob.mortran
+*.mortlst
+*.lst
+*.log
+*.F
+
+#ignore archives
+*.zip
+*.gz
+*.tar
+
+#ignore pdfs
+*.pdf
+
+#ignore compiled
+*.dll
+*.exe
+*.o
+*.so
+
+#ignore output files
+*.bin
+*.att
+*.npy
