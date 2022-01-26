@@ -1,3 +1,36 @@
+/*
+###############################################################################
+#
+#   EGS_XGI RefractiveIndexCalculator
+#   Class to handle the decrement \delta of the real part of the refractive
+#   index: n = 1 - \delta
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
+
 #include "RefractiveIndexCalculator.h"
 #include <map>
 #include "xgi_global_variables.h"
@@ -35,7 +68,7 @@ RefractiveIndexCalculator::~RefractiveIndexCalculator()
 	<medium_name_1> <\delta_1^{*}>
 	<medium_name_2> <\delta_2^{*}>
 	...
-	with the medium names maching the PEGS file.
+	with the medium names matching the PEGS file.
 	Note: Not all media defined in the PEGS file need to be listed. Only those used in the simulation run
 		  are needed
 	Note: $\delta^{*} is assumed to be 0 for all medium names that are not found in the refractive index file$*/
@@ -62,7 +95,6 @@ void RefractiveIndexCalculator::ImportRefractiveIndex(string i_sRefFile, EGS_Bas
 			string copy = sLine;
 			sLine.erase(nSpace, string::npos);
 
-			//Now comapare the medium name found in the input file to the actual media names defined.
 			for (unsigned int i = 0; i < sMediaNames.size(); i++)
 			{
 				if ((sMediaNames[i]).compare(sLine) == 0)
@@ -70,15 +102,12 @@ void RefractiveIndexCalculator::ImportRefractiveIndex(string i_sRefFile, EGS_Bas
 					copy.erase(0, nSpace + 1);
 					EGS_Float value = stod(copy);
 					Buffer.insert(pair<int, EGS_Float>(i, value));
-					//FoundRefIndex = true;
 					break;
 				}
 			}
 		}
 	}
 
-
-	//Now save the refractive index ordered by their medium index:
 	for (unsigned int i = 0; i < NumberOfMedia; i++)
 	{
 		if (Buffer.find(i) != Buffer.end())

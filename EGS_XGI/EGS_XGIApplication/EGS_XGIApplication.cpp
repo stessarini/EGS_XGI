@@ -1,12 +1,41 @@
+/*
+###############################################################################
+#
+#   EGS_XGI EGS_XGIApplication
+#   Base class for XGI applications derived from EGS_AdvancedApplication (part
+#   of EGSnrc)
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
 #include <vector>
 #include <iomanip>
 #include <map>
 
 #include "EGS_XGIApplication.h"
 #include "DefaultSplittingAlgorithm.h"
-
-
-//#include "gimc_stacks.h"
 #include "xgi_global_variables.h"
 
 #include "egs_functions.h"
@@ -161,8 +190,7 @@ int EGS_XGIApplication::run()
                                              " cases, cpu time = %9.3f\n",
                                              100*aperb*(icase/nperb),timer.time());
 		}
-		//Draw the next particle from the source.
-		//rndm is a pointer to a random number generators.
+		//Get the next particle from the source.
     EGS_I64 this_case = source->getNextParticle(rndm,q,latch,E,wt,x,u);
     int ireg = geometry->isWhere(x);
     if (ireg < 0)
@@ -188,17 +216,6 @@ int EGS_XGIApplication::run()
         m_fEtot += E*wt;
         m_fNormalization += wt;
       }
-			/*if(icase >= 2500)
-			{
-				std::cout << "icase: " << icase << std::endl;
-			}
-			if(icase == 2704)
-			{
-				std::cout << "case 2704" << std::endl;
-				int a;
-				std::cin >> a;
-			}*/
-			//m_nDebugCounter = 0;
 			m_nNumberOfReflections = 0;
       the_stack->E[0] = (q) ? E + the_useful->rm : E;
       the_stack->x[0] = x.x;
@@ -285,262 +302,37 @@ void EGS_XGIApplication::ActivateAusgabCals()
 	the_epcont->iausfl[AfterBhabha] = 0;       //!< after an inelastic collision (e+)			11
 	the_epcont->iausfl[BeforeAnnihFlight] = 0;  //!< before annihilation in flight				12
 	the_epcont->iausfl[AfterAnnihFlight] = 0;   //!< after annihilation in flight				13
-	the_epcont->iausfl[BeforeAnnihRest] = 0;    //!< before annihilation at rest				14 			28
-	the_epcont->iausfl[AfterAnnihRest] = 0;     //!< after annihilation at rest					15			14
-	the_epcont->iausfl[BeforePair] = 1;         //!< before pair production						16				15
-	the_epcont->iausfl[AfterPair] = 1;          //!< after pair production						17				16
-	the_epcont->iausfl[BeforeCompton] = 1;      //!< before a Compton scattering event			18	17
-	the_epcont->iausfl[AfterCompton] = 1;       //!< after a Compton scattering event			19		18
-	the_epcont->iausfl[BeforePhoto] = 1;        //!< before a photo-absorption event			20		19
-	the_epcont->iausfl[AfterPhoto] = 1;         //!< after a photo-absorption event				21		20
-	the_epcont->iausfl[EnteringUphi] = 0;       //!< the rotation routine was just entered		22	21
-	the_epcont->iausfl[LeavingUphi] = 0;        //!< about to leave the rotation routine		23		22
-		 //!< I consider the above 2 to be obsolete
-	the_epcont->iausfl[BeforeRayleigh] = 1;     //!< before coherent scattering					24				23
-	the_epcont->iausfl[AfterRayleigh] = 1;      //!< after coherent scattering					25				24
-	the_epcont->iausfl[FluorescentEvent] = 0;   //!< a fluorescent transition just occured		26	25
-	the_epcont->iausfl[CosterKronigEvent] = 0;  //!< a Coster-Kronig transition just occured	27	26
-	the_epcont->iausfl[AugerEvent] = 0;         //!< an Auger transition just occured			28			27
-	the_epcont->iausfl[BeforePhotoNuc] = 0;      //!< before a photonuclear event				29				29
-	the_epcont->iausfl[AfterPhotoNuc] = 0;       //!< after a photonuclear event				30
+	the_epcont->iausfl[BeforeAnnihRest] = 0;    //!< before annihilation at rest				 			28
+	the_epcont->iausfl[AfterAnnihRest] = 0;     //!< after annihilation at rest								14
+	the_epcont->iausfl[BeforePair] = 1;         //!< before pair production										15
+	the_epcont->iausfl[AfterPair] = 1;          //!< after pair production										16
+	the_epcont->iausfl[BeforeCompton] = 1;      //!< before a Compton scattering event				17
+	the_epcont->iausfl[AfterCompton] = 1;       //!< after a Compton scattering event					18
+	the_epcont->iausfl[BeforePhoto] = 1;        //!< before a photo-absorption event					19
+	the_epcont->iausfl[AfterPhoto] = 1;         //!< after a photo-absorption event						20
+	the_epcont->iausfl[EnteringUphi] = 0;       //!< the rotation routine was just entered			21
+	the_epcont->iausfl[LeavingUphi] = 0;        //!< about to leave the rotation routine				22
+	the_epcont->iausfl[BeforeRayleigh] = 1;     //!< before coherent scattering									23
+	the_epcont->iausfl[AfterRayleigh] = 1;      //!< after coherent scattering									24
+	the_epcont->iausfl[FluorescentEvent] = 0;   //!< a fluorescent transition just occured			25
+	the_epcont->iausfl[CosterKronigEvent] = 0;  //!< a Coster-Kronig transition just occured		26
+	the_epcont->iausfl[AugerEvent] = 0;         //!< an Auger transition just occured						27
+	the_epcont->iausfl[BeforePhotoNuc] = 0;      //!< before a photonuclear event								29
+	the_epcont->iausfl[AfterPhotoNuc] = 0;       //!< after a photonuclear event
 	//the_epcont->iausfl[AfterSubPhoton] = 1;			//33 after sub-threshold photon energy deposition
-	the_epcont->iausfl[UnknownCall] = 0;         //!< last element in the enumeration			31			35
+	the_epcont->iausfl[UnknownCall] = 0;         //!< last element in the enumeration						35
 }
 
 
 
-/*This function performs ray-tracing using the top parameters on the_stack (e.g. the_stack->x[the_stack->np-1]). It transports the_stack entry untill it exits the geeometry.
+/*This function performs ray-tracing using the top parameters on the_stack (e.g. the_stack->x[the_stack->np-1]). It transports the_stack entry until it exits the geometry.
 IMPORTANT, this function changes the_stack, i.e. parameters on top of the_stack have to be saved in the meantime for later use*/
-/*void EGS_XGIApplication::PerformRayTracing()
-{
-	//Get the initial parameters for the transport
-	int nStackAddress = the_stack->np-1;
-	//the_stack->latch[nStackAddress] = 2;
-	int StacksizeBefore = nStackAddress;
-	EGS_Float fEnergy = the_stack->E[nStackAddress];
-
-	//Since energy is constant during ray-tracing
-	std::vector<EGS_Float> fRefractiveIndex(geometry->nMedia());
-	for(unsigned int nMediumCounter = 0; nMediumCounter != m_fMu_over_two_ForInitialEnergy.size(); nMediumCounter++)
-	{
-		fRefractiveIndex[nMediumCounter] = 1.0 - m_pRefractiveIndexCalculator->GetRefractiveIndexDelta(nMediumCounter, fEnergy);
-	}
-
-	//Get initial parameters from the_stack
-	EGS_Vector fDirection;
-	fDirection.x = the_stack->u[nStackAddress];
-	fDirection.y = the_stack->v[nStackAddress];
-	fDirection.z = the_stack->w[nStackAddress];
-	fDirection.normalize();
-	//in case u,v,w are copied during splitting:
-	the_stack->u[nStackAddress] = fDirection.x;
-	the_stack->v[nStackAddress] = fDirection.y;
-	the_stack->w[nStackAddress] = fDirection.z;
-
-	EGS_Vector fPositionOld;
-	fPositionOld.x = the_stack->x[nStackAddress];
-	fPositionOld.y = the_stack->y[nStackAddress];
-	fPositionOld.z = the_stack->z[nStackAddress];
-
-	EGS_Vector fPositionNew;
-
-	//Overestimate the distance to the next interface
-	EGS_Float fDistanceToNextInterface = 1e30;
-
-	int nRegionIndexOld = the_stack->ir[nStackAddress] - 2;
-	int nMediumOld = geometry->medium(nRegionIndexOld);
-	int nMediumNew = -1;
-	EGS_Vector fSurfaceNormal;
-	int nRegionIndexNew= geometry->howfar(nRegionIndexOld, fPositionOld, fDirection, fDistanceToNextInterface, &nMediumNew, &fSurfaceNormal);
-	//Don't do the +2 for region numbers, since don't use FORTRAN and don't do splitting based on region numbers.
-	the_stack->ir[nStackAddress] = nRegionIndexNew;
-
-	//Transport
-	fPositionNew.x = fPositionOld.x + fDistanceToNextInterface * fDirection.x;
-	fPositionNew.y = fPositionOld.y + fDistanceToNextInterface * fDirection.y;
-	fPositionNew.z = fPositionOld.z + fDistanceToNextInterface * fDirection.z;
-
-	the_stack->x[nStackAddress] = fPositionNew.x;
-	the_stack->y[nStackAddress] = fPositionNew.y;
-	the_stack->z[nStackAddress] = fPositionNew.z;
-
-	//Track phase and norm
-	if(nMediumOld >= 0)
-	{
-		e_fLogNorm[nStackAddress] -= fDistanceToNextInterface * m_fMu_over_two_ForInitialEnergy[nMediumOld];
-		e_fPhase[nStackAddress] += fDistanceToNextInterface * fRefractiveIndex[nMediumOld];
-	}
-	else
-	{
-		//In case of vacuum vacuum
-		e_fPhase[nStackAddress] += fDistanceToNextInterface;
-	}
-
-	//Split path
-	m_pSplittingAlgorithm->PotentialParticleSplitting();
-
-	int StackAddressAfterAppliedSplitting = the_stack->np -1;
-	nRegionIndexNew = the_stack->ir[StackAddressAfterAppliedSplitting];
-	fPositionNew.z = the_stack->z[StackAddressAfterAppliedSplitting];
-
-	//if didn't split, new medium  and not leaving geometry, apply Snell's law
-	if((StacksizeBefore == StackAddressAfterAppliedSplitting) && nMediumOld != nMediumNew && nRegionIndexNew != -1)
-	{
-		int nReflectionTransmission;
-		nReflectionTransmission = ApplySnellsLawHowfar(&fPositionNew, &fPositionOld, &fDirection, nRegionIndexNew, nRegionIndexOld,  nMediumNew, nMediumOld, fEnergy, &fSurfaceNormal);
-		if(abs(fDirection.length() - 1) > 1e-6 )
-		{
-			std::cout << "fDirection not normalized (" << fDirection.x <<", " << fDirection.y << "; " << fDirection.z << ")" << std::endl;
-		}
-		if(nReflectionTransmission == 0)
-		{
-			the_stack->u[nStackAddress] = fDirection.x;
-			the_stack->v[nStackAddress] = fDirection.y;
-			the_stack->w[nStackAddress] = fDirection.z;
-		}
-		else if (nReflectionTransmission == 1)
-		{
-			the_stack->u[nStackAddress] = fDirection.x;
-			the_stack->v[nStackAddress] = fDirection.y;
-			the_stack->w[nStackAddress] = fDirection.z;
-			nRegionIndexNew = the_stack->ir[nStackAddress] - 2;
-			nMediumNew = nMediumOld;
-		}
-		else if(nReflectionTransmission == -2)
-		{
-			std::cout << "Warning: Unknown call ApplySnellsLawHowfar" << std::endl;
-		}
-	}
-	else if(nStackAddress < StackAddressAfterAppliedSplitting)
-	{
-		fDirection.x = the_stack->u[StackAddressAfterAppliedSplitting];
-		fDirection.y = the_stack->v[StackAddressAfterAppliedSplitting];
-		fDirection.z = the_stack->w[StackAddressAfterAppliedSplitting];
-	}
-	//the_stack->latch[nStackAddress] = 3;
-	while( ((StacksizeBefore < the_stack->np-1) || nRegionIndexNew != -1) )
-	{
-		//Set the old values to new values
-		fPositionOld = fPositionNew;
-		fDistanceToNextInterface = 1e30;
-		nStackAddress = the_stack->np-1;
-		nRegionIndexOld = nRegionIndexNew;
-		nMediumOld = nMediumNew;
-
-		//Get new values
-		nRegionIndexNew = geometry->howfar(nRegionIndexOld, fPositionOld, fDirection, fDistanceToNextInterface, &nMediumNew, &fSurfaceNormal);
-		the_stack->ir[nStackAddress] = nRegionIndexNew;
-
-		//Transport
-		fPositionNew.x = fPositionOld.x + fDistanceToNextInterface * fDirection.x;
-		fPositionNew.y = fPositionOld.y + fDistanceToNextInterface * fDirection.y;
-		fPositionNew.z = fPositionOld.z + fDistanceToNextInterface * fDirection.z;
-
-		the_stack->x[nStackAddress] = fPositionNew.x;
-		the_stack->y[nStackAddress] = fPositionNew.y;
-		the_stack->z[nStackAddress] = fPositionNew.z;
-
-		//Track phase and norm
-		if(nMediumOld >= 0)
-		{
-			e_fLogNorm[nStackAddress] -= fDistanceToNextInterface * m_fMu_over_two_ForInitialEnergy[nMediumOld];
-			e_fPhase[nStackAddress] += fDistanceToNextInterface * fRefractiveIndex[nMediumOld];
-		}
-		else
-		{
-			e_fPhase[nStackAddress] += fDistanceToNextInterface;
-		}
-
-		m_pSplittingAlgorithm->PotentialParticleSplitting();
-		StackAddressAfterAppliedSplitting = the_stack->np-1;
-		//Update region number and position in case the splitting plane "absorbed" path
-		nRegionIndexNew = the_stack->ir[StackAddressAfterAppliedSplitting];
-		fPositionNew.z = the_stack->z[StackAddressAfterAppliedSplitting];
-		if((nStackAddress == StackAddressAfterAppliedSplitting) && nMediumOld != nMediumNew && nRegionIndexNew != -1 )
-		{
-			int nReflectionTransmission;
-			nReflectionTransmission =ApplySnellsLawHowfar(&fPositionNew, &fPositionOld, &fDirection, nRegionIndexNew, nRegionIndexOld,  nMediumNew, nMediumOld, fEnergy, &fSurfaceNormal);
-			if(nReflectionTransmission == 0)
-			{
-				the_stack->u[nStackAddress] = fDirection.x;
-				the_stack->v[nStackAddress] = fDirection.y;
-				the_stack->w[nStackAddress] = fDirection.z;
-			}
-			else if (nReflectionTransmission == 1)
-			{
-				the_stack->u[nStackAddress] = fDirection.x;
-				the_stack->v[nStackAddress] = fDirection.y;
-				the_stack->w[nStackAddress] = fDirection.z;
-				nRegionIndexNew = the_stack->ir[nStackAddress] - 2;
-				nMediumNew = nMediumOld;
-			}
-			else if (nReflectionTransmission == -2)
-			{
-				std::cout << "Warming: Unknown call of ApplySnellsLawHowfar" << std::endl;
-			}
-		}
-		else if(nStackAddress < StackAddressAfterAppliedSplitting)
-		{
-			fDirection.x = the_stack->u[StackAddressAfterAppliedSplitting];
-			fDirection.y = the_stack->v[StackAddressAfterAppliedSplitting];
-			fDirection.z = the_stack->w[StackAddressAfterAppliedSplitting];
-		}
-		if(nRegionIndexNew == -1 && (StacksizeBefore < StackAddressAfterAppliedSplitting))
-		{
-			the_stack->E[StackAddressAfterAppliedSplitting] = 0.0;
-
-			the_stack->x[StackAddressAfterAppliedSplitting] = 0.0;
-      the_stack->y[StackAddressAfterAppliedSplitting] = 0.0;
-      the_stack->z[StackAddressAfterAppliedSplitting] = 0.0;
-
-			the_stack->u[StackAddressAfterAppliedSplitting] = 0.0;
-      the_stack->v[StackAddressAfterAppliedSplitting] = 0.0;
-      the_stack->w[StackAddressAfterAppliedSplitting] = 0.0;
-
-			the_stack->dnear[StackAddressAfterAppliedSplitting] = 0;
-      the_stack->wt[StackAddressAfterAppliedSplitting] = 0.0;
-      the_stack->ir[StackAddressAfterAppliedSplitting] = 0;
-      the_stack->iq[StackAddressAfterAppliedSplitting] = 0;
-      the_stack->latch[StackAddressAfterAppliedSplitting] = 0;
-
-			e_fPhase[StackAddressAfterAppliedSplitting] = 0.0;
-      e_fLogNorm[StackAddressAfterAppliedSplitting] = 0.0;
-      e_bPrimary[StackAddressAfterAppliedSplitting] = false;
-
-			nRegionIndexNew = the_stack->ir[StackAddressAfterAppliedSplitting - 1];
-
-      fPositionNew.x = the_stack->x[StackAddressAfterAppliedSplitting -1];
-      fPositionNew.y = the_stack->y[StackAddressAfterAppliedSplitting -1];
-      fPositionNew.z = the_stack->z[StackAddressAfterAppliedSplitting -1];
-
-			fDirection.x = the_stack->u[StackAddressAfterAppliedSplitting - 1];
-			fDirection.y = the_stack->v[StackAddressAfterAppliedSplitting -1];
-			fDirection.z = the_stack->w[StackAddressAfterAppliedSplitting - 1];
-
-			nMediumNew = geometry->medium(nRegionIndexNew);
-
-			m_pSplittingAlgorithm->PotentialParameterReset();
-      the_stack->np -= 1;
-		}
-	}
-	m_pSplittingAlgorithm->PotentialParameterReset();
-	e_fPhase[StacksizeBefore] = 0.0;
-	e_fLogNorm[StacksizeBefore] = 0.0;
-}*/
 
 int EGS_XGIApplication::PerformRayTracing()
 {
-	//int dummy;
-	//Since energy is constant during ray-tracing
-	//std::cout << "RT starts: " << the_stack->np-1 << std::endl;
 	int nStackAddressBeforeRayTracing = the_stack->np-1;
 	int nRegionIndexOld = the_stack->ir[nStackAddressBeforeRayTracing] - 2;
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << "-------------------" << "RT start" << "-----------------------" << std::endl;
-		std::cout << ",np-1:" << nStackAddressBeforeRayTracing << ",ir:" << the_stack->ir[nStackAddressBeforeRayTracing] - 2 << std::endl;
-		std::cout << "r=(" << the_stack->x[nStackAddressBeforeRayTracing] << "," << the_stack->y[nStackAddressBeforeRayTracing]  << "," << the_stack->z[nStackAddressBeforeRayTracing] <<")" << std::endl;
-	}*/
+
 	if(nRegionIndexOld < 0)
 	{
 		std::cout << "RT initial position outside..." << std::endl;
@@ -579,11 +371,6 @@ int EGS_XGIApplication::PerformRayTracing()
 	//BeforeTransport:
 
   //Get parameters from the_stack
-    /*
-		position
-    Direction
-    region index
-    */
 	EGS_Vector fDirection;
 	fDirection.x = the_stack->u[nStackAddressBeforeRayTracing];
 	fDirection.y = the_stack->v[nStackAddressBeforeRayTracing];
@@ -602,16 +389,7 @@ int EGS_XGIApplication::PerformRayTracing()
   int nMediumOld = geometry->medium(nRegionIndexOld);
 	int nMediumNew = -1;
 	EGS_Vector fSurfaceNormal;
-	//std::cout << ".............................................." << std::endl;
-	//std::cout << "RT before x = " << fPositionOld.x << ", " << fPositionOld.y << ", " << fPositionOld.z << std::endl;
-	//std::cout << "medium name: " << geometry->getMediumName(nMediumOld) << std::endl;
-	//std::cout << "np-1 = " << the_stack->np-1 << std::endl;
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << ",np-1:" << nStackAddressBeforeRayTracing << ",ir:" << the_stack->ir[nStackAddressBeforeRayTracing] - 2 << std::endl;
-		std::cout << "r=(" << fPositionOld.x << "," << fPositionOld.y  << "," << fPositionOld.z <<")" << std::endl;
-		std::cout << "nMediumOld: " << nMediumOld << std::endl;
-	}*/
+
 
   EGS_Float fDistanceToNextInterface = 1e30;
   int nRegionIndexNew= geometry->howfar(nRegionIndexOld, fPositionOld, fDirection, fDistanceToNextInterface, &nMediumNew, &fSurfaceNormal);
@@ -637,32 +415,15 @@ int EGS_XGIApplication::PerformRayTracing()
   the_stack->y[nStackAddressBeforeRayTracing] = fPositionNew.y;
   the_stack->z[nStackAddressBeforeRayTracing] = fPositionNew.z;
 
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << ",np-1:" << nStackAddressBeforeRayTracing << ",ir:" << the_stack->ir[nStackAddressBeforeRayTracing] - 2 << std::endl;
-		std::cout << "r_new=(" << fPositionNew.x << "," << fPositionNew.y  << "," << fPositionNew.z <<")" << std::endl;
-		std::cout << "nMediumNew: " << nMediumNew << std::endl;
-	}*/
-	/*std::cout << "RT after x = " << fPositionNew.x << ", " << fPositionNew.y << ", " << fPositionNew.z << std::endl;
-	if(nMediumNew >= 0)
-	{
-		std::cout << "medium name: " << geometry->getMediumName(nMediumNew) << std::endl;
-	}
-	std::cout << "np-1 = " << the_stack->np-1 << std::endl;*/
-	//AfterTransport:
 
   //Split path
 	m_pSplittingAlgorithm->PotentialParticleSplitting();
   int StackAddressAfterAppliedSplitting = the_stack->np -1;
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << "after splitting: np-1:" << StackAddressAfterAppliedSplitting << ",ir:" << the_stack->ir[StackAddressAfterAppliedSplitting] - 2 << std::endl;
-	}*/
+
   if(nStackAddressBeforeRayTracing == StackAddressAfterAppliedSplitting)
   {
   	nRegionIndexNew = the_stack->ir[nStackAddressBeforeRayTracing] - 2;
-  	//fPositionNew.z = the_stack->z[nStackAddressBeforeRayTracing];
-    if(nRegionIndexNew < 0)
+  	if(nRegionIndexNew < 0)
     {
 			//UserDiscard
 			m_pSplittingAlgorithm->PotentialParameterReset();
@@ -691,15 +452,8 @@ int EGS_XGIApplication::PerformRayTracing()
     }
     else if(nMediumOld != nMediumNew)
     {
-			/*if(m_nDebugCounter >= 4505541)
-			{
-				std::cout << "Before SnellsLaw" << std::endl;
-			}*/
-      int nReflectionTransmission = ApplySnellsLawHowfar(&fPositionNew, &fPositionOld, &fDirection, nRegionIndexNew, nRegionIndexOld,  nMediumNew, nMediumOld, fEnergy, &fSurfaceNormal);
-			/*if(m_nDebugCounter >= 4505541)
-			{
-				std::cout << "after SnellsLaw" << std::endl;
-			}*/
+			int nReflectionTransmission = ApplySnellsLawHowfar(&fPositionNew, &fPositionOld, &fDirection, nRegionIndexNew, nRegionIndexOld,  nMediumNew, nMediumOld, fEnergy, &fSurfaceNormal);
+
 			if(nReflectionTransmission == 0)
   		{
   			the_stack->u[nStackAddressBeforeRayTracing] = fDirection.x;
@@ -726,12 +480,8 @@ int EGS_XGIApplication::PerformRayTracing()
 		fDirection.y = the_stack->v[StackAddressAfterAppliedSplitting];
 		fDirection.z = the_stack->w[StackAddressAfterAppliedSplitting];
   }
-	//std::cin >> dummy;
   int nStackAddress = StackAddressAfterAppliedSplitting;
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << "Before while loop RT" << std::endl;
-	}*/
+
   while(nStackAddressBeforeRayTracing <= nStackAddress)
   {
     //BeforeTransport
@@ -739,19 +489,6 @@ int EGS_XGIApplication::PerformRayTracing()
     fPositionOld = fPositionNew;
     nRegionIndexOld = nRegionIndexNew;
     nMediumOld = nMediumNew;
-		/*if(m_nDebugCounter >= 4505541)
-		{
-			std::cout << "++++++++++++++++++++++++++++++++" << std::endl;
-			std::cout << ",np-1:" << nStackAddress << ",ir:" << the_stack->ir[nStackAddress] - 2 << std::endl;
-			std::cout << "r=(" << fPositionOld.x << "," << fPositionOld.y  << "," << fPositionOld.z <<")" << std::endl;
-			std::cout << "nMediumOld: " << nMediumOld << std::endl;
-			int aa;
-			std::cin >> aa;
-		}*/
-		/*std::cout << ".............................................." << std::endl;
-		std::cout << "RT before x = " << fPositionOld.x << ", " << fPositionOld.y << ", " << fPositionOld.z << std::endl;
-		std::cout << "medium name: " << geometry->getMediumName(nMediumOld) << std::endl;
-		std::cout << "np-1 = " << the_stack->np-1 << std::endl;*/
     fDistanceToNextInterface = 1e30;
     nRegionIndexNew = geometry->howfar(nRegionIndexOld, fPositionOld, fDirection, fDistanceToNextInterface, &nMediumNew, &fSurfaceNormal);
 
@@ -774,31 +511,17 @@ int EGS_XGIApplication::PerformRayTracing()
     the_stack->x[nStackAddress] = fPositionNew.x;
 		the_stack->y[nStackAddress] = fPositionNew.y;
 		the_stack->z[nStackAddress] = fPositionNew.z;
-		/*if(m_nDebugCounter >= 4505541)
-		{
-			std::cout << ",np-1:" << nStackAddress << ",ir:" << the_stack->ir[nStackAddress] - 2 << std::endl;
-			std::cout << "r_new=(" << fPositionNew.x << "," << fPositionNew.y  << "," << fPositionNew.z <<")" << std::endl;
-			std::cout << "nMediumNew: " << nMediumNew << std::endl;
-		}*/
-		/*std::cout << "RT after x = " << fPositionNew.x << ", " << fPositionNew.y << ", " << fPositionNew.z << std::endl;
-		std::cout << "medium name: " << geometry->getMediumName(nMediumNew) << std::endl;
-		std::cout << "np-1 = " << the_stack->np-1 << std::endl;*/
 
     //AfterTransport
     m_pSplittingAlgorithm->PotentialParticleSplitting();
 		StackAddressAfterAppliedSplitting = the_stack->np-1;
-		/*if(m_nDebugCounter >= 4505541)
-		{
-			std::cout << "after splitting: np-1:" << StackAddressAfterAppliedSplitting << ",ir:" << the_stack->ir[StackAddressAfterAppliedSplitting] - 2 << std::endl;
-		}*/
+
     if(nStackAddress == StackAddressAfterAppliedSplitting)
     {
     	nRegionIndexNew = the_stack->ir[nStackAddress] - 2;
-    	//fPositionNew.z = the_stack->z[nStackAddress];
       if(nRegionIndexNew < 0)
       {
 				//UserDiscard
-				//std::cout << "RT Discard in while loop" << std::endl;
 				m_pSplittingAlgorithm->PotentialParameterReset();
         //delete the path
         the_stack->E[StackAddressAfterAppliedSplitting] = 0.0;
@@ -836,20 +559,10 @@ int EGS_XGIApplication::PerformRayTracing()
   			fDirection.z = the_stack->w[nStackAddress];
 
   			nMediumNew = geometry->medium(nRegionIndexNew);
-				//std::cout << "np-1 = " << the_stack->np-1 << std::endl;
-
       }
       else if(nMediumOld != nMediumNew)
       {
-				/*if(m_nDebugCounter >= 4505541)
-				{
-					std::cout << "before SnellsLaw" <<std::endl;
-				}*/
         int nReflectionTransmission = ApplySnellsLawHowfar(&fPositionNew, &fPositionOld, &fDirection, nRegionIndexNew, nRegionIndexOld,  nMediumNew, nMediumOld, fEnergy, &fSurfaceNormal);
-				/*if(m_nDebugCounter >= 4505541)
-				{
-					std::cout << "after SnellsLaw " << nReflectionTransmission <<std::endl;
-				}*/
         if(nReflectionTransmission == 0)
     		{
     			the_stack->u[nStackAddress] = fDirection.x;
@@ -878,12 +591,6 @@ int EGS_XGIApplication::PerformRayTracing()
       nStackAddress = StackAddressAfterAppliedSplitting;
     }
   }
-	/*std::cout << "RT ends: " << the_stack->np-1 << std::endl;
-	std::cin >> dummy;*/
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << "RT end" <<std::endl;
-	}*/
   return 0;
 }
 
@@ -983,7 +690,6 @@ int EGS_XGIApplication::ApplySnellsLawHowfar(EGS_Vector* i_pPosition, EGS_Vector
 				}
 				else
 				{
-					//o_nReport = 3;
 					return 3;
 				}
 			}
@@ -1018,7 +724,6 @@ int EGS_XGIApplication::InitSplittingAlgorithm()
 {
 	EGS_Input* pSplittingAlgDefInput = NULL;
 	bool bdelete_input = false;
-	//input->print(0,std::cout);
 	if(!input->isA("splitting algorithm definition"))
 	{
 		pSplittingAlgDefInput = input->takeInputItem("splitting algorithm definition");

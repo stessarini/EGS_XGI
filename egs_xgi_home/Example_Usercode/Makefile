@@ -1,27 +1,33 @@
 ###############################################################################
-# Edited makefile to build grating interferometry application.
 #
-# This file is part of the grating interferometry expansion of EGSnrc.
+#   Default EGS_XGI C++ makefile for the example usercode. Derived from EGSnrc
+#   tutor7pp application
 #
-# GI EGS is free software you can redistribute it and/or modify it under
-#  the terms of the GNU Affero General Public License as published by the
-#  Free Software Foundation, either version 3 of the License, or (at your
-#  option) any later version.
 #
-# GI EGSnrc is distributed in the hope that it will be useful, but WITHOUT ANY
-#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-#  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
-#  more details.
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
 #
-# A copy of the GNU Affero GEneral Public License <LINK> is distributed with
-# GI EGS.
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 ###############################################################################
 #
-# Author: Stefan Tessarini, 2021
+#   Changes made by:     Stefan Tessarini
 #
-# Contributors: Werner Volken, Daniel Frei
 #
+#
+###############################################################################
+
 # Original header:
 ###############################################################################
 #
@@ -58,24 +64,33 @@
 #
 ###############################################################################
 
-#Set the following headers.
-#HEN_HOUSE, EGS_CONFIG, and my_machine are only needed if they are not set already
-#EGS_HOME has to be reset for EGS_XGI simulations
-# alternatively, the content of egs_xgi_home can be moved to into egs_home in that
-# case the standard EGS_HOME can be used
-EGS_HOME := /media/gerhard/SeagateExpansionDrive/PhD/MC/EGSnrc18/EGS_XGI_extension/egs_xgi_home/
-HEN_HOUSE := /home/gerhard/MC/EGSnrc18/HEN_HOUSE/
+#The following environment variables have to be defined:
+#EGSnrc specific:
+#  Only needed if they are not already set globally
+#     HEN_HOUSE
+#     EGS_CONFIG
+#     my_machine
+#
+# EGS_HOME has to be temporarily reset for EGS_XGI simulations. (Both
+# compilation and run-time)
+# EGS_HOME has to contain 2 folders <bin> and one with the usercode name
+# bin/ has to contain a folder with the name of $my_machine
+# Extension library specific:
+# XGI_PATH has to point to the location of the downloaded EGS_XGI folder
+
+EGS_HOME := /path/to/egs_xgi_home/
+HEN_HOUSE := /path/to/EGSnrc/HEN_HOUSE/
 #usually the EGS_CONFIG file is located at: $(HEN_HOUSE)/specs/$(my_machine).conf
-EGS_CONFIG := /home/gerhard/MC/EGSnrc18/HEN_HOUSE/specs/gcc750
+EGS_CONFIG := /EGSnrc/config/file
+#sometimes required:
 #ABS_EGSPP := /$(HEN_HOUSE)/egs++/
-XGI_PATH := /media/gerhard/SeagateExpansionDrive/PhD/MC/EGSnrc18/EGS_XGI_extension/EGS_XGI/
+XGI_PATH := /path/to/EGS_XGI/
 my_machine := gcc750
 
 include $(EGS_CONFIG)
 include $(SPEC_DIR)egspp1.spec
 include $(SPEC_DIR)egspp_$(my_machine).conf
-#DEBUG OPtions
-#include $(SPEC_DIR)egspp_$(my_machine)_debug.conf
+
 
 opt += -I$(XGI_PATH)/XGI_stacks/
 opt += -I$(XGI_PATH)/EGS_XGIApplication/
@@ -99,14 +114,6 @@ opt += -I$(XGI_PATH)/RefractiveIndexCalculator/
 
 
 opt += -std=c++0x
-#DEBUG OPTION
-#opt += -g
-#opt += -Wall
-
-#FORTRAN DEBUG OPTIONS:
-#FOPT = -O1 $(FDEBUG)
-#FC_FLAGS = $(FOPT) $(FCFLAGS)
-#$(info $$FC_FLAGS is [${FC_FLAGS}])
 
 # Specify the name of the user code.
 # The name of the executable is determined from this variable.
@@ -138,19 +145,7 @@ CPP_SOURCES = $(C_ADVANCED_SOURCES)
 other_dep_user_code =
 
 include $(XGI_PATH)/Makefiles/cpp_makefile_xgi_application
-#$(HEN_HOUSE)makefiles$(DSEP)cpp_makefile
-#cpp_makefile_ad
 
 egs_config1_path = $(HEN_HOUSE)/lib/$(my_machine)/
 
 xgi_global_variables_$(my_machine).$(obje): $(XGI_PATH)/XGI_stacks/xgi_global_variables.cpp $(XGI_PATH)/XGI_stacks/xgi_global_variables.h $(egs_config1_path)/egs_config1.h
-
-#test_sources:
-#	@echo "$(C_SOURCES)"
-#
-#test_objects:
-#	@echo "egs_objects: $(egs_objects)"
-#	@echo "user_objects: $(user_objects)"
-#
-#c_sources:
-#	@echo "C_SOURCES: $(CPP_SOURCES)"

@@ -1,28 +1,32 @@
 ###############################################################################
-# Default EGS_XGI C++ makefile based on: Default EGSnrc default C++ makefile
+#
+#   Default EGS_XGI C++ makefile based on: Default EGSnrc C++ makefile
 #
 #
-# This file is part of EGS_XGI.
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
 #
-# EGS_XGI is free software: you can redistribute it and/or modify it under
-#  the terms of the GNU Affero General Public License as published by the
-#  Free Software Foundation, either version 3 of the License, or (at your
-#  option) any later version.
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
 #
-#  EGS_XGI is distributed in the hope that it will be useful, but WITHOUT ANY
-#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-#  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
-#  more details.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
 #
-#  You should have received a copy of the GNU Affero General Public License
-#  along with EGS_XGI. If not, see <http://www.gnu.org/licenses/>.
-###############################################################################
-#
-# Author: Stefan Tessarini
-#
-# Contributors
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 ###############################################################################
+#
+#   Changes made by:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
 # Original header:
 ###############################################################################
 #
@@ -59,7 +63,7 @@
 #
 ###############################################################################
 
-
+#EGS_XGI additions/changes:
 #include $(EGS_CONFIG)
 #include $(SPEC_DIR)egspp1.spec
 
@@ -95,6 +99,9 @@ phase_objects=egs_xgi_application.o
 
 splitting_algorithm_objects=OpticalElement.o SplittingObject.o DetectorZPlane.o SplittingAlgorithm.o DefaultSplittingAlgorithm.o DetectorZPlaneMem.o FourierSeriesZPlane.o RefractiveIndexCalculator.o BinarySourceGratingFourierZPlane.o HuygensZPlane.o
 ###############################################################################
+
+
+
 all: $(target) $(lib_target)
 
 $(target): $(user_objects) $(egs_objects) $(phase_objects) $(splitting_algorithm_objects)
@@ -103,7 +110,11 @@ $(target): $(user_objects) $(egs_objects) $(phase_objects) $(splitting_algorithm
 $(lib_target): $(user_lib_objects) $(egs_lib_objects)
 	$(CXX) $(opt) $(shared) $(lib_link1) $^ $(extra) $(link2_prefix)egspp$(link2_suffix) $(fortran_libs) $(user_libs)
 
+
+
+
 #####################################################
+#EGS_XGI additions:
 
 egs_xgi_application.$(obje): $(dep_xgi_application) $(dep_advanced_application)
 	$(object_rule) $(user_libs)
@@ -138,6 +149,8 @@ BinarySourceGratingFourierZPlane.$(obje):$(dep_BinarySourceGratingFourierZPlane)
 
 HuygensZPlane.$(obje):$(dep_HuygensZPlane)
 	$(object_rule) $(user_libs)
+
+#add additional extensions here:
 
 
 #####################################################
