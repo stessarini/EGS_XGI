@@ -1,3 +1,35 @@
+/*
+###############################################################################
+#
+#   EGS_XGI DetectorZPlane
+#   A basic detector class (orthogonal to z-axis).
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
+
 #include "DetectorZPlane.h"
 #include "xgi_global_variables.h"
 
@@ -194,7 +226,6 @@ void DetectorZPlane::WriteOnFile(long int i_nLastCase)
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlane::WriteOnFile: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -213,7 +244,6 @@ void DetectorZPlane::WriteOnFile(long int i_nLastCase)
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlane::WriteOnFile: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -246,7 +276,7 @@ void DetectorZPlane::WriteOnFile(long int i_nLastCase)
 	if(bBinaryFileIsOpen)//if opened the binary successfully
 	{
 		//assuming noone interfered with the file system during the writing process...
-		//always want to put the Attribute file at the same location as the binary
+		//always want to put the attribute file at the same location as the binary
 		AttributeFileName.append(".att");
 		AttributeFile.open(AttributeFileName, std::ios::out | std::ios::trunc);
 		if(AttributeFile.is_open())
@@ -283,7 +313,6 @@ void DetectorZPlane::WriteToFileNumberOfPaths()
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlane::WriteToFileNumberOfPaths: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
@@ -302,7 +331,6 @@ void DetectorZPlane::WriteToFileNumberOfPaths()
 		if(!bBinaryFileIsOpen)
 		{
 			//Failed to open the file.
-			//maybe the path doesn't exist or don't have permission
 			//try other location
 			std::cout << "DetectorZPlane::WriteToFileNumberOfPaths: Warning unable to open file: " << BinaryFileName << std::endl;
 		}
