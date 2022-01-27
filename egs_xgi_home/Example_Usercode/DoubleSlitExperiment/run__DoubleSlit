@@ -1,5 +1,35 @@
 #!/bin/bash
 
+###############################################################################
+#
+#   Example run script for EGS_XGI applications
+#		Runs double slit experiment simulation of referenced publication.
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
 export EGS_HOME=/path/to/egs_xgi_home/
 #if not using default:
 export HEN_HOUSE=/path/to//HEN_HOUSE/
@@ -12,7 +42,7 @@ cd ..
 the_dir=./DoubleSlitExperiment/
 input0=DoubleSlit_d2em4_a2em5_CohPointSource
 mv $the_dir"/"$input0".egsinp" .
-../bin/$my_machine/Example_Usercode -p 521icru -i $input0 -r PolystyreneSpheres -n $n > $the_dir"/out_"$input0".txt"
+../bin/$my_machine/Example_Usercode -p 521icru -i $input0 -r PolystyreneSpheres -n $n > $the_dir"/"$input0".log"
 mv $input0".egsinp" $the_dir
 
 exit 0
