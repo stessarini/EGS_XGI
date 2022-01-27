@@ -1,0 +1,17 @@
+# to perform the Talbot carpet comparison simulations
+
+# open a terminal
+# cd to this location
+
+# run the setup script:
+# python required: make sure that the python executable is in the PATH environment variable
+# otherwise modify 'setup_simulations.sh' accordingly
+./setup_simulations.sh
+
+# run the simulations with the run script
+./run_all.sh
+# this start 5 simulations at a time in parallel
+# especially the Huygens simulations can take a long time (see publication).
+
+#run the python analysis script:
+python Talbot_carpet_comparison.py
