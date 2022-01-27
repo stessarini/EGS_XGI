@@ -29,6 +29,8 @@
 #
 ###############################################################################
 
+
+
 #if run individual scripts:
 #export EGS_HOME=/path/to/egs_xgi_home/
 #if not using default:
@@ -36,23 +38,22 @@
 #export EGS_CONFIG=/path/to/config/file
 #export my_machine=my_machine_name
 
-
-n=8000000
+n=500000
 i=0
 i_max=10
-j=5
-j_max=43
+j=0
+j_max=7
 
 cd ..
 
 
 while [ $j -lt $j_max ]
 do
-  the_dir=./TalbotCarpet_comparison/Fourier_8e6_$j/
+  the_dir=./TalbotCarpet_comparison/Huygens_5e5_$j/
   i=0
   while [ $i -lt $i_max ]
   do
-    file_name="TC_Fourier_8e6_NG1_"$j"_ind_"$i
+    file_name="TC_Hugens_5e5_exp_"$j"_ind_"$i
     output_file=$file_name".log"
     mv $the_dir"/"$file_name".egsinp" .
     rm $the_dir/$output_file
@@ -70,12 +71,12 @@ do
   echo "move:"
   while [ $i -lt $i_max ]
   do
-    file_name="TC_Fourier_8e6_NG1_"$j"_ind_"$i
+    file_name="TC_Hugens_5e5_exp_"$j"_ind_"$i
     echo $the_dir'/'$file_name
     mv $file_name".egsinp" $the_dir
     i=$[$i+1]
   done
-  j=$[$j+2]
+  j=$[$j+1]
   wait
 done
 

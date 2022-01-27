@@ -2,7 +2,8 @@
 
 ###############################################################################
 #
-#   Bash script to run one set of Talbot carpet simulations
+#   Bash script to set up the Talbot carpet simulations for the comparison
+#   between uniform (Huygens) splitting and Fourier splitting
 #   Copyright (C) 2020  ETH Zürich
 #
 #   This file is part of the EGS_XGI - an X-ray grating interferometry
@@ -29,56 +30,22 @@
 #
 ###############################################################################
 
-#if run individual scripts:
-#export EGS_HOME=/path/to/egs_xgi_home/
-#if not using default:
-#export HEN_HOUSE=/path/to//HEN_HOUSE/
-#export EGS_CONFIG=/path/to/config/file
-#export my_machine=my_machine_name
 
+#Make sure a suitable python version is installed
+#Dependent on your python version/system setup change python to python3,
+# python3.8,.. if needed
 
-n=8000000
-i=0
-i_max=10
-j=5
-j_max=43
+mkdir "Fourier_1e6_"{5..43..2}
+python create_input_files_TalbotCarpet_Fourier_1e6.py
 
-cd ..
+mkdir "Fourier_4e6_"{5..43..2}
+python create_input_files_TalbotCarpet_Fourier_4e6.py
 
+mkdir "Fourier_8e6_"{5..43..2}
+python create_input_files_TalbotCarpet_Fourier_8e6.py
 
-while [ $j -lt $j_max ]
-do
-  the_dir=./TalbotCarpet_comparison/Fourier_8e6_$j/
-  i=0
-  while [ $i -lt $i_max ]
-  do
-    file_name="TC_Fourier_8e6_NG1_"$j"_ind_"$i
-    output_file=$file_name".log"
-    mv $the_dir"/"$file_name".egsinp" .
-    rm $the_dir/$output_file
-    echo $the_dir'/'$file_name
-    ../bin/$my_machine/Example_Usercode -p 521icru -i $file_name -r RefractiveIndexFile -n $n > $the_dir/$output_file &
-    if [[ $(( $i % 5 )) == 4 ]]
-    then
-      echo "wait"
-      wait
-    fi
-    i=$[$i+1]
-  done
-  wait
-  i=0
-  echo "move:"
-  while [ $i -lt $i_max ]
-  do
-    file_name="TC_Fourier_8e6_NG1_"$j"_ind_"$i
-    echo $the_dir'/'$file_name
-    mv $file_name".egsinp" $the_dir
-    i=$[$i+1]
-  done
-  j=$[$j+2]
-  wait
-done
+mkdir "Huygens_1e6_"{0..6}
+python create_input_files_TalbotCarpet_Huygens_1e6.py
 
-
-
-exit 0
+mkdir "Huygens_5e5_"{0..6}
+python create_input_files_TalbotCarpet_Huygens_5e5.py
