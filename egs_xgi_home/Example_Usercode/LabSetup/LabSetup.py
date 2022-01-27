@@ -1,4 +1,32 @@
 # -*- coding: utf-8 -*-
+###############################################################################
+#
+#   python analysis file for lab setup simulation
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -32,10 +60,6 @@ del simulation_data_2
 
 
 
-#plt.plot(simulation_data[5,:])
-#plt.show()
-
-
 #####################################
 #imprt reference without graings
 binary_file_name='LabSetup_NoG_0_detectorMem1'
@@ -53,8 +77,6 @@ averaged_signal_NoG =sum(simulation_data_NoG)
 ######################################
 
 
-#plt.plot(averaged_signal_NoG[:])
-#plt.show()
 
 #rebin no grating signal into 67 pixel signals (neglect the 2 boundary pixels)
 M = 40000
@@ -64,11 +86,6 @@ rebinned_average_MC_intensity_NOG = np.sum(np.reshape(averaged_signal_NoG, (int(
 
 
 normalization_constant = np.mean(rebinned_average_MC_intensity_NOG)
-#plt.title("normalized signal NoG")
-#plt.plot(rebinned_average_MC_intensity_NOG / normalization_constant)
-#plt.ylim((0.0,1.05))
-#plt.grid()
-#plt.show()
 
 
 ######################################
@@ -127,11 +144,7 @@ print("classically_expected_intensity_reduction" + str(classically_expected_inte
 
 print("MC over expected rel. signals: " + str(total_intensity / total_intensity_NG0 / classically_expected_intensity_reduction))
 print("Difference in relative signals: " + str(1 - total_intensity / total_intensity_NG0 / classically_expected_intensity_reduction))
-#check if number of deletions have something to do with the signal reduction
-fraction_deleted_at_G0 = 125599/251451
-print("reduction due to path deletion in MC = " + str(fraction_deleted_at_G0))
-print("take into account deletions at G0: " + str(0.5/fraction_deleted_at_G0 * total_intensity / total_intensity_NG0))
-print("Difference in relative signals corrected: " + str(1 - 0.5/fraction_deleted_at_G0 * total_intensity / total_intensity_NG0 / classically_expected_intensity_reduction))
+
 print("--------------------------------------------------------------------------")
 
 ##############################################################
@@ -197,17 +210,7 @@ cropped_simulation_data = simulation_data[:, int(np.floor(to_crop/2)):(width-int
 print("size of cropped data: " + str(cropped_simulation_data.shape))
 
 simulated_psc = calculate_phase_stepping_curve(nPixelX, nPixelY, nMask, nPhaseSteps, cropped_simulation_data)
-#plot a phase stepping curve
-#plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-#plt.plot(simulated_psc[:,0,int(np.floor(nPixelX/2))])
-#plt.xlabel("phase step", fontsize=27)
-#plt.ylabel("signal", fontsize=27)
-#plt.xticks(fontsize=25)
-#plt.yticks(fontsize=25)
-#plt.xlim((0,nPhaseSteps-1))
-#plt.grid()
-#plt.subplots_adjust(bottom=0.13, top=0.957, right=0.97, left= 0.155)
-#plt.show()
+
 
 print("-------------------------------------------------------")
 
@@ -222,19 +225,6 @@ print("maximum visibility without first and last pixel: " + str(np.max(simulated
 print("minimum visibility: " + str(np.min(simulated_visibility_map_2NG0[0,:])))
 print("minimum visibility without first and last pixel: " + str(np.min(simulated_visibility_map_2NG0[0,1:65])))
 
-
-#visibility plot
-#x_pixel = np.linspace(-FOV / 2.0 + pixelWidth / 2.0, FOV / 2.0 - pixelWidth / 2.0, nPixelX)
-#plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-#plt.plot(10 * x_pixel, simulated_visibility_map_2NG0[0,:],color='k',linestyle='solid', linewidth=2)
-#plt.xlabel("x (mm)", fontsize=27)
-#plt.ylabel("visibility", fontsize=27)
-#plt.xticks(fontsize=25)
-#plt.yticks(fontsize=25)
-#plt.ylim((0,0.4))
-#plt.grid()
-#plt.subplots_adjust(bottom=0.13, top=0.957, right=0.97, left= 0.155)
-#plt.show()
 
 
 
@@ -265,26 +255,3 @@ print("averaged correction factor over all energies")
 av_corr = np.sum(probabilities * (np.exp(-mu_SI * thickness_G2) - np.exp(-mu_AU * thickness_G2)) / (np.exp(-mu_SI * thickness_G2) + np.exp(-mu_AU * thickness_G2)))
 print("visibility correction poly AU-SI grating: " + str(av_corr))
 print("visibility corrected poly AU-SI grating: " + str(av_corr * np.mean(simulated_visibility_map_2NG0[0,1:65])))
-
-print("-------------------------------------------------------")
-print("classical visibility correction G0 leakage for monochromatic beams. Consider mean energy")
-print("this neglects interference effects")
-thickness_G0 = 0.003
-print("transmission IR: " + str(np.exp(-mu_IR[ID_char] * thickness_G0)))
-v_corr_monpo_IRSI_char = (np.exp(-mu_SI[ID_char] * thickness_G0) - np.exp(-mu_IR[ID_char] * thickness_G0)) / (np.exp(-mu_SI[ID_char] * thickness_G0) + np.exp(-mu_IR[ID_char] * thickness_G0))
-print("visibility correction mono IR-SI grating: " +str(v_corr_monpo_IRSI_char))
-print("product of G0 and G1 visibility corrections: " + str(v_corr_monpo_IRSI_char * v_corr_monpo_AUSI_char))
-print("corrected visibility G0 G1: " + str(v_corr_monpo_IRSI_char * v_corr_monpo_AUSI_char * np.mean(simulated_visibility_map_2NG0[0,1:65]) ))
-("-------------------------------------------------------")
-print("classical visibility correction G0 leakage average over energies")
-print("this neglects interference effects")
-IRSI_av_corr = np.sum(probabilities * (np.exp(-mu_SI * thickness_G0) - np.exp(-mu_IR * thickness_G0)) / (np.exp(-mu_SI * thickness_G0) + np.exp(-mu_IR * thickness_G0)))
-print("visibility correction poly IR_SI: " + str(IRSI_av_corr))
-print("visibility corrected poly IR_SI(G2) and AU_SI (G0): " + str(IRSI_av_corr * av_corr * np.mean(simulated_visibility_map_2NG0[0,1:65])))
-
-("-------------------------------------------------------")
-av_leakage_G2 = np.sum(probabilities * np.exp(-mu_AU * thickness_G2))
-av_transmission_G2 = np.sum(probabilities * np.exp(-mu_SI * thickness_G2))
-print("spectrum average for leakage G2 AU parts: " + str(av_leakage_G2))
-print("spectrum average for transmission G2 SI paarts: " + str(av_transmission_G2))
-print("correction factor ploy G2: " + str((av_transmission_G2 - av_leakage_G2) /(av_transmission_G2 + av_leakage_G2)))
