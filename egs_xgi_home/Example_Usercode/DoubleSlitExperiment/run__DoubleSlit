@@ -3,7 +3,7 @@
 ###############################################################################
 #
 #   Example run script for EGS_XGI applications
-#		Runs double slit experiment simulation of referenced publication.
+#		Runs double slit experiment simulation.
 #   Copyright (C) 2020  ETH Zürich
 #
 #   This file is part of the EGS_XGI - an X-ray grating interferometry
