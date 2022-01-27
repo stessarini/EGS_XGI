@@ -26,3 +26,7 @@ mortjob.mortran
 
 #ignore EGSnrc input files
 *.egsinp
+
+#ignore automatically generated folders
+egs_xgi_home/Example_Usercode/TalbotCarpet_comparison/Fourier_*/
+egs_xgi_home/Example_Usercode/TalbotCarpet_comparison/Huygens_*/
