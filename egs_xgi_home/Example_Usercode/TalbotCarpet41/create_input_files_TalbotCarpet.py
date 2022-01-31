@@ -1,4 +1,34 @@
 # -*- coding: utf-8 -*-
+
+###############################################################################
+#
+#   Python script - generates Talbot carpet simulation input files
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
 from string import Template
 import numpy as np
 
@@ -14,7 +44,7 @@ inputfile_template=Template('''\
 :start geometry definition:
 	###################################
 	###################################
-		# The grating Wafer dummy with medium
+		# The auxiliary grating Wafer with medium
 		:start geometry:
 			library = egs_ndgeometry
 			type = EGS_XYZGeometry
@@ -131,7 +161,7 @@ inputfile_template=Template('''\
 ###############################################
 
 :start run control:
-	 ncase = 3000000#100000
+	 ncase = 3000000
 :stop run control:
 ###############################################
 ###############################################
@@ -156,22 +186,22 @@ inputfile_template=Template('''\
 	:start splitting algorithm:
 		type = DefaultSplittingAlgorithm
 		setup = PhaseGrating detector1
-		source coherence = coherent # incoherent coherent
+		source coherence = coherent
 	:stop splitting algorithm:
 
 	:start optical element:
 		name = PhaseGrating
 		type = FourierSeriesZPlane
 		position = 0.0
-		phase shift at design energy = 1.0 #in units of pi
+		phase shift at design energy = 1.0
 		duty cycle = 0.5
-		periodicity = 0.0004 #in [cm]
+		periodicity = 0.0004
 		highest fourier order = 41
 		design energy = 0.02
 		Epsilon = 0.000001
-		model attenuation = 0 #0 false; 1 true
-		norm at design energy = 1.0 1.0 #if constant set for a , b sections: >= 0
-		direction correction = 0 #0 false; 1 true
+		model attenuation = 0
+		norm at design energy = 1.0 1.0
+		direction correction = 0
 	:stop optical element:
 
 	:start optical element:

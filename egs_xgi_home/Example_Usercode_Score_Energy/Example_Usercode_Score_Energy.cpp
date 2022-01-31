@@ -1,11 +1,35 @@
-/***************************************************
-*	Example_Usercode_Score_Energy.cpp
-*		- Derive from EGS_AdvancedApplication
-*
-*
-*
-*
-****************************************************/
+/*
+###############################################################################
+#
+#   EGS_XGI Example_Usercode_Score_Energy
+#   An example usercode for using EGS_XGI features within EGSnrc with energy
+#		scoring features (compare EGSnrc tutor7pp)
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+*/
 
 #include "Example_Usercode_Score_Energy.h"
 
@@ -24,174 +48,10 @@ Example_Usercode_Score_Energy::Example_Usercode_Score_Energy(int argc, char **ar
 {
 	m_nNumberOfPhotonScatteringEvents = 0;
 
-	/************************************************************/
-	//extract data for python:
-	/*std::cout.precision(17);
-	std::cout << "mu and delta at 20 keV of" << std::endl;
-	for(int nMediaIndex = 0; nMediaIndex != geometry->nMedia(); nMediaIndex++)
-	{
-		std::cout << geometry->getMediumName(nMediaIndex) << ": " << 1.0 / i_gmfp[nMediaIndex].interpolate(log(0.020)) << std::endl;
-		std::cout << "\t" << m_pRefractiveIndexCalculator->GetRefractiveIndexDelta(nMediaIndex, 0.020) <<std::endl;
-	}
-*/
-	/*std::vector<EGS_Float> energies{0.01,0.011,0.012,0.013,0.014,0.015,0.016,0.017,0.018,0.019,0.02,0.021,0.022,0.023,0.024,0.025,0.026,0.027,0.028,0.029,0.03,0.031,0.032,0.033,0.034,0.035,0.036,0.037,0.038,0.039,0.04,0.041};
-	std::cout << "mu of " << std::endl;
-	for(int nMediaIndex = 0; nMediaIndex != geometry->nMedia(); nMediaIndex++)
-	{
-		std::cout << geometry->getMediumName(nMediaIndex) << ": ";
-		for(int j = 0; j < energies.size(); j++)
-		{
-			std::cout << 1.0 / i_gmfp[nMediaIndex].interpolate(log(energies[j]))<<", ";
-		}
-		std::cout << std::endl;
-	}*/
-	/************************************************************/
 	m_nNumberOfRegions = geometry->regions();
 	m_pDepositedEnergy = new EGS_ScoringArray(m_nNumberOfRegions + 3);
 	m_fScoredEnergyThisHistory = 0.0;
-	the_epcont->iausfl[ExtraEnergy] = 1;         /*!< initiated when part of the energy is not transfered to particles (e.g. binding energy). iarg == 4*/
-
-
-	//Do some ireg tests on geometry
-	/*EGS_Vector x;
-	x.x = 0.0;
-	x.y = 0.0;
-	x.z = -0.249;
-	int ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-
-	x.x = -0.10045;
-	x.y = 0.0;
-	x.z = -0.0125;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-	x.x = 0.10045;
-	x.y = 0.0;
-	x.z = -0.0125;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-
-	x.x = -0.10045;
-	x.y = 0.0;
-	x.z = 0.0020;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-
-	x.x = 0.10045;
-	x.y = 0.0;
-	x.z = 0.0020;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-
-
-	x.x = 0.0;
-	x.y = 0.001;
-	x.z = 0.115;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-
-
-
-	x.x = 0.0;
-	x.y = -0.001;
-	x.z = 0.115;
-	ireg = geometry->isWhere(x);
-	std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-	std::cout << "ireg: " << ireg << std::endl;
-	if(ireg >= 0)
-	{
-		int nmed = geometry->medium(ireg);
-		std::cout << "medium index: " << nmed << std::endl;
-		std::cout << "medium: " << geometry->getMediumName(nmed) << std::endl;
-	}
-	std::cout << "-------------" << std::endl;
-	std::cout << "check grating" << std::endl;
-	for(int i = 0; i < 4020; i++)
-	{
-		x.x = -0.10045 + i * 0.0001;
-		x.y = 0.0;
-		x.z = -0.0125;
-		ireg = geometry->isWhere(x);
-		//std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-		//std::cout << "ireg: " << ireg << std::endl;
-		if(ireg >= 0)
-		{
-			int nmed = geometry->medium(ireg);
-			//std::cout << "medium index: " << nmed << std::endl;
-			std::cout << x.x << " - " << ireg << " - medium: " << geometry->getMediumName(nmed) << std::endl;
-		}
-	}
-	for(int i = 0; i < 4020; i++)
-	{
-		x.x = -0.10045 + i * 0.0001;
-		x.y = 0.0;
-		x.z = 0.0020;
-		ireg = geometry->isWhere(x);
-		//std::cout << "x: (" << x.x << ", " << x.y << ", " << x.z << ")" << std::endl;
-		//std::cout << "ireg: " << ireg << std::endl;
-		if(ireg >= 0)
-		{
-			int nmed = geometry->medium(ireg);
-			//std::cout << "medium index: " << nmed << std::endl;
-			std::cout << x.x << " - " << ireg << " - medium: " << geometry->getMediumName(nmed) << std::endl;
-		}
-	}
-	std::cout << "+++++++++++++ " << x.x << " ++++++++++++++++++++++" << std::endl;
-	int a;
-	std::cin >> a;*/
+	the_epcont->iausfl[ExtraEnergy] = 1;
 }
 
 Example_Usercode_Score_Energy::~Example_Usercode_Score_Energy()
@@ -204,54 +64,6 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 	int nStackAddress = the_stack->np-1;
 	int nCharge = the_stack->iq[nStackAddress];
 	bool bIsPrimary = e_bPrimary[nStackAddress];
-	//the_stack->latch[nStackAddress] = iarg;
-//simple way of following setp by step:
-/*if(bIsPrimary == false && nCharge == 0)
-{*/
-/*	std::cout << "------------------------------------------" << std::endl;
-	std::cout << "iarg = " << iarg << std::endl;
-	std::cout << "charge = " << nCharge << std::endl;
-	std::cout << "......" << std::endl;
-	std::cout << "np-1 = " << the_stack->np-1 << std::endl;
-	std::cout << "the_stack->npold-1 = " << the_stack->npold - 1 << std::endl;
-	std::cout << "......" << std::endl;
-	std::cout << "r = (" << the_stack->x[nStackAddress] << ", " << the_stack->y[nStackAddress]  << ", " << the_stack->z[nStackAddress] <<")" << std::endl;
-	std::cout << "p = " << the_stack->u[nStackAddress] << ", " << the_stack->v[nStackAddress] << ", " << the_stack->w[nStackAddress] << ")" << std::endl;
-	std::cout << "e_fLogNorm[np-1] = " <<  "= " << e_fLogNorm[nStackAddress] << std::endl;
-	std::cout << "......" << std::endl;
-	std::cout << "the_stack->ir[nStackAddress] = " << the_stack->ir[nStackAddress] - 2 << std::endl;
-	std::cout << "the_epcont->irold = " << the_epcont->irold - 2 << std::endl;
-	std::cout << "the_epcont->irnew = " << the_epcont->irnew - 2 << std::endl;
-	std::cout << "......" << std::endl;
-	std::cout << "the_stack->wt[nStackAddress] = " << the_stack->wt[nStackAddress] << std::endl;
-	std::cout << "e_fPhase[np-1] = " << e_fPhase[nStackAddress] << std::endl;
-	std::cout << "inside geometry: " << geometry->getName() << std::endl;
-	int imed = geometry->medium(the_stack->ir[nStackAddress] - 2);
-	std::cout << "medium index: " << imed << std::endl;
-	if(imed >= 0)
-	{
-		std::cout << "medium name: " << geometry->getMediumName(imed) << std::endl;
-	}
-	std::cout << m_pSplittingAlgorithm->WhichOpticalElement() << std::endl;*/
-	//int b;std::cin >> b;
-/*}*/
-	/*if(icase == 2704 && iarg == BeforeTransport)
-	{
-		m_nDebugCounter++;
-		std::cout << "-------------------" << m_nDebugCounter << "-----------------------" << std::endl;
-		std::cout << "iarg:" << iarg << ",np-1:" << nStackAddress << ",ir:" << the_stack->ir[nStackAddress] - 2 << std::endl;
-		std::cout << "r=(" << the_stack->x[nStackAddress] << "," << the_stack->y[nStackAddress]  << "," << the_stack->z[nStackAddress] <<")" << std::endl;
-	}*/
-	/*if(m_nDebugCounter >= 4505541)
-	{
-		std::cout << "-------------------" << m_nDebugCounter << "-----------------------" << std::endl;
-		std::cout << "iarg:" << iarg << ",np-1:" << nStackAddress << ",ir:" << the_stack->ir[nStackAddress] - 2 << std::endl;
-		std::cout << "r=(" << the_stack->x[nStackAddress] << "," << the_stack->y[nStackAddress]  << "," << the_stack->z[nStackAddress] <<")" << std::endl;
-		std::cout << "p=(" << the_stack->u[nStackAddress] << "," << the_stack->v[nStackAddress]  << "," << the_stack->w[nStackAddress] <<")" << std::endl;
-		std::cout << "nCharge: " << nCharge << std::endl;
-		int aa;
-		std::cin >> aa;
-	}*/
 
 	//score energy:
 	if(iarg <= 4)
@@ -278,7 +90,7 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 		e_bPrimary[nStackAddress] = false;
 		the_stack->latch[nStackAddress] = 0;
 	}
-	else if(iarg == BeforeTransport && nCharge == 0/* && bIsPrimary == true*/)
+	else if(iarg == BeforeTransport && nCharge == 0)
 	{
 		m_fPositionBeforeTVStep.x = the_stack->x[nStackAddress];
 		m_fPositionBeforeTVStep.y = the_stack->y[nStackAddress];
@@ -290,10 +102,6 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 			int nMediumIndex = geometry->medium(nCurrentRegion);
 			EGS_Float fEnergy = the_stack->E[nStackAddress];
 			EGS_Float steplength = the_epcont->tvstep;
-			/*if(m_nDebugCounter >= 4505541)
-			{
-				std::cout << "tvstep: " << the_epcont->tvstep << std::endl;
-			}*/
 			e_fPhase[nStackAddress] += steplength * (1.0 - m_pRefractiveIndexCalculator->GetRefractiveIndexDelta(nMediumIndex, fEnergy));
 			if(nMediumIndex >= 0)
 			{
@@ -305,18 +113,9 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 	{
 		int nPreviousRegion =  the_epcont->irold - 2;
 		int nCurrentRegion = the_stack->ir[nStackAddress] - 2;
-		//Splitting can only occur at medium interfaces
 		if(nCurrentRegion != nPreviousRegion)
 		{
-			/*if(m_nDebugCounter >= 4505541)
-			{
-				std::cout << "before PotentialParticleSplitting" <<std::endl;
-			}*/
 			m_pSplittingAlgorithm->PotentialParticleSplitting();
-			/*if(m_nDebugCounter >= 4505541)
-			{
-				std::cout << "after PotentialParticleSplitting" <<std::endl;
-			}*/
 			if(nStackAddress == the_stack->np-1 && nCharge == 0 && nPreviousRegion > -1 && nCurrentRegion > -1)
 			{
 				int nMediumIndexNew = geometry->medium(nCurrentRegion);
@@ -335,15 +134,7 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 
 					EGS_Float fEnergy = the_stack->E[nStackAddress];
 					int nReflectionTransmission;
-					/*if(m_nDebugCounter >= 4505541)
-					{
-						std::cout << "before ApplySnellsLawHowfar" <<std::endl;
-					}*/
 					nReflectionTransmission = ApplySnellsLawHowfar(&fPosition, &m_fPositionBeforeTVStep, &fDirection, nCurrentRegion, nPreviousRegion,  nMediumIndexNew, nMediumIndexOld, fEnergy);
-					/*if(m_nDebugCounter >= 4505541)
-					{
-						std::cout << "aftere ApplySnellsLawHowfar: " << nReflectionTransmission << std::endl;
-					}*/
 					if(nReflectionTransmission == 0 || nReflectionTransmission == 1)
 					{
 						the_stack->u[nStackAddress] = fDirection.x;
@@ -366,7 +157,7 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 	}
 	else if(bIsPrimary == true)
 	{
-		if( iarg == BeforePhoto || iarg == BeforeCompton || iarg == BeforeRayleigh /*|| iarg == BeforePair*/)
+		if( iarg == BeforePhoto || iarg == BeforeCompton || iarg == BeforeRayleigh)
 		{
 			m_nInteractionCheck = iarg;
 			int nStackSizeBeforeRayTracing = the_stack->np;
@@ -408,7 +199,6 @@ int Example_Usercode_Score_Energy::ausgab(int iarg)
 			the_epcont->irnew = nRegionNewBerforeRayTracing;
 			the_stack->ir[nStackAddress] = nRegionBeforeRayTracing;
 
-			//Check a few
 			if(the_stack->x[nStackAddress] != fXPosition || fUDirection != the_stack->u[nStackAddress])
 			{
 				std::cout << "warning RT changed the_stack" << std::endl;
@@ -468,12 +258,6 @@ void Example_Usercode_Score_Energy::reportResults()
 void Example_Usercode_Score_Energy::startHistory(EGS_I64 this_case)
 {
 	m_pDepositedEnergy->setHistory(this_case);
-	/*if(abs(m_fScoredEnergyThisHistory - m_fEnergyLastHistory) > 1e-5)
-	{
-		std::cout << "scored energy not conseved " << this_case - 1 << ": " << m_fEnergyLastHistory - m_fScoredEnergyThisHistory << " MeV, " << m_nInteractionCheck << std::endl;
-	}
-	m_fScoredEnergyThisHistory = 0.0;
-	m_nInteractionCheck = 0;*/
 	if(m_fEnergyLastHistory != the_stack->E[0])
 	{
 		m_pSplittingAlgorithm->StartRayTracing(the_stack->E[0]);
@@ -490,10 +274,7 @@ void Example_Usercode_Score_Energy::endHistory()
 
 	//make sure energy is conseved on history base and score energy in extra entry:
 	m_pDepositedEnergy->score(m_nNumberOfRegions  + 2, abs(m_fScoredEnergyThisHistory - m_fEnergyLastHistory));
-	/*if(abs(m_fScoredEnergyThisHistory - m_fEnergyLastHistory) > 1e-5)
-	{
-		std::cout << "scored energy not conseved : " << m_fEnergyLastHistory - m_fScoredEnergyThisHistory << " MeV, " << m_nInteractionCheck << std::endl;
-	}*/
+
 	m_fScoredEnergyThisHistory = 0.0;
 	m_nInteractionCheck = 0;
 }

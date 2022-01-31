@@ -25,7 +25,7 @@
 #
 #   Author:     Stefan Tessarini
 #
-#
+#		Contributors: Werner Volken, Daniel Frei
 #
 ###############################################################################
 */

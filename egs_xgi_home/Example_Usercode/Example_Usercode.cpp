@@ -25,19 +25,12 @@
 #
 #   Author:     Stefan Tessarini
 #
-#
+#		Contributors: Werner Volken, Daniel Frei
 #
 ###############################################################################
 */
 
-/***************************************************
-*	Example_Usercode.cpp
-*		- Derive from EGS_AdvancedApplication
-*
-*
-*
-*
-****************************************************/
+
 
 #include "Example_Usercode.h"
 

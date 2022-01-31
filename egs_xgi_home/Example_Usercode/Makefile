@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   Default EGS_XGI C++ makefile for the example usercode. Derived from EGSnrc
-#   tutor7pp application
-#
+#   Default EGS_XGI C++ makefile for the example usercode. Amended EGSnrc
+#   tutor7pp application Makefile
+#		Copyright (C) 2020  ETH Zürich
 #
 #   This file is part of the EGS_XGI - an X-ray grating interferometry
 #   extension for EGSnrc.
@@ -24,10 +24,11 @@
 #
 #   Changes made by:     Stefan Tessarini
 #
-#
+#		Contributors: Werner Volken, Daniel Frei
 #
 ###############################################################################
 
+###############################################################################
 # Original header:
 ###############################################################################
 #
@@ -73,7 +74,7 @@
 #
 # EGS_HOME has to be temporarily reset for EGS_XGI simulations. (Both
 # compilation and run-time)
-# EGS_HOME has to contain 2 folders <bin> and one with the usercode name
+# EGS_HOME has to contain 2 folders <bin> and <usercode name>
 # bin/ has to contain a folder with the name of $my_machine
 # Extension library specific:
 # XGI_PATH has to point to the location of the downloaded EGS_XGI folder
@@ -85,7 +86,7 @@ EGS_CONFIG := /EGSnrc/config/file
 #sometimes required:
 #ABS_EGSPP := /$(HEN_HOUSE)/egs++/
 XGI_PATH := /path/to/EGS_XGI/
-my_machine := gcc750
+my_machine := set_my_machine_name
 
 include $(EGS_CONFIG)
 include $(SPEC_DIR)egspp1.spec
@@ -149,3 +150,13 @@ include $(XGI_PATH)/Makefiles/cpp_makefile_xgi_application
 egs_config1_path = $(HEN_HOUSE)/lib/$(my_machine)/
 
 xgi_global_variables_$(my_machine).$(obje): $(XGI_PATH)/XGI_stacks/xgi_global_variables.cpp $(XGI_PATH)/XGI_stacks/xgi_global_variables.h $(egs_config1_path)/egs_config1.h
+
+#test_sources:
+#	@echo "$(C_SOURCES)"
+#
+#test_objects:
+#	@echo "egs_objects: $(egs_objects)"
+#	@echo "user_objects: $(user_objects)"
+#
+#c_sources:
+#	@echo "C_SOURCES: $(CPP_SOURCES)"

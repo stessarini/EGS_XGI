@@ -1,5 +1,33 @@
+###############################################################################
+#
+#   Python analysis for PW_Cylinder image simulations
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
 import numpy as np
-#import math
 
 import matplotlib.pyplot as plt
 
@@ -12,7 +40,7 @@ from import_detector_signal import get_detector_dimensions, get_number_of_histor
 nPixelX = 100
 nPixelY = 50
 
-#material constants
+#medium constants
 mu_SI = 9.8542424227788743
 mu_AIR = 0.00083461802611759059
 mu_POLY = 0.40132757723110096
@@ -24,7 +52,7 @@ delta_POLY = 5.8040247585592379e-07
 print("############################################")
 print("Import data...")
 
-binary_file_name = '2mmx1mmFOV_PlaneWave_Empty_G12d0p5_0_detector1'
+binary_file_name = '2mmx1mmFOV_PlaneWave_Reference_G12d0p5_0_detector1'
 #dimensions of the detector
 [FOV_x, FOV_y] = get_detector_dimensions(binary_file_name)
 print("[FOV_x, FOV_y]: ")
@@ -35,7 +63,7 @@ print("number of histories: " + str(N_hist))
 print("load: " + binary_file_name)
 [width, height, simulation_data_ref] = import_detector_signal_from_file(binary_file_name)
 
-binary_file_name = '2mmx1mmFOV_PlaneWave_Empty_G12d0p5_0_NOP_detector1.bin'
+binary_file_name = '2mmx1mmFOV_PlaneWave_Reference_G12d0p5_0_NOP_detector1.bin'
 print("load: " + binary_file_name)
 simulation_data_NOP_ref = np.reshape(np.fromfile(binary_file_name,dtype=np.uintc),(height,width))
 
@@ -52,30 +80,11 @@ simulation_data_NOP_sam = np.reshape(np.fromfile(binary_file_name,dtype=np.uintc
 
 
 
-
-print("############################################")
-print("Check weight total signal for reference signal...")
-
-
 total_signal_ref = np.sum(simulation_data_ref)
 relative_singal_ref = total_signal_ref / N_hist
 
-#expected signal (Beer-Lambert law)
-#medium thickness
-d_wafer = 0.0250
-d_AIR = 2.41966 + 0.250 - d_wafer
-d_G1 = 0.0025
-net_attenuation_G1 = 0.5 * np.exp(-mu_SI * d_G1) + 0.5 * np.exp(-mu_AIR * d_G1)
-classical_reduction = net_attenuation_G1 * np.exp(-mu_SI * d_wafer) * np.exp(-mu_AIR * d_AIR)
-print("'integrated MC reference signal' / 'Number of Histories': " + str(relative_singal_ref))
-print("classical signal no sample: " + str(classical_reduction))
 
 
-plt.plot(np.sum(simulation_data_ref[int(height/3)-9:int(height/3)+9,:],axis=0))
-plt.show()
-
-plt.plot(np.sum(simulation_data_sam[int(height/3)-9:int(height/3)+9,:],axis=0))
-plt.show()
 
 
 print("############################################")
@@ -85,7 +94,7 @@ nonzero_ref = np.greater(simulation_data_NOP_ref, 0)
 MC_signal_ref_NOP = np.zeros(simulation_data_ref.shape)
 MC_signal_ref_NOP[nonzero_ref] = simulation_data_ref[nonzero_ref] / (simulation_data_NOP_ref[nonzero_ref]**2)
 normalization_const_ref = total_signal_ref / np.sum(MC_signal_ref_NOP)
-#maintain same total intensity
+#keep total signal constant
 MC_signal_ref_NOP = MC_signal_ref_NOP * normalization_const_ref
 del nonzero_ref, simulation_data_ref, simulation_data_NOP_ref
 
@@ -105,7 +114,7 @@ del nonzero_sam, simulation_data_sam, simulation_data_NOP_sam
 print("############################################")
 print("Add primary and secondary signals...")
 
-binary_file_name = '2mmx1mmFOV_PlaneWave_Empty_G12d0p5_0_SecondarySignal_detector1'
+binary_file_name = '2mmx1mmFOV_PlaneWave_Reference_G12d0p5_0_SecondarySignal_detector1'
 print("load: " + binary_file_name)
 [width, height, simulation_data_sec_ref] = import_detector_signal_from_file(binary_file_name)
 MC_signal_ref_NOP = MC_signal_ref_NOP + simulation_data_sec_ref
@@ -133,13 +142,13 @@ duty_cycle_G2 = 0.5 #other duty cycles currently not supported
 #	the FOV is a integer multiple of period_G2/2
 #	period_G2/2 is an integer multiple of data_point width
 
-#nMask number of MC data points corresponding to the width of an absorbing section of G2
-#i.e. how many consecutive data points are blocked by one slab of the grating
+#nMask number of MC bins corresponding to the width of an absorbing section of G2
+#i.e. how many consecutive bins are blocked by one slab of the grating
 nMask = int(np.round(duty_cycle_G2 * width * period_G2 / FOV_x))
-print("data points in x: " + str(width))
-print("data points in y: " + str(height))
-print("data point per pixel x: " + str(width / nPixelX))
-print("data point per pixel y: " + str(height / nPixelY))
+print("bins in x: " + str(width))
+print("bins in y: " + str(height))
+print("bins per pixel x: " + str(width / nPixelX))
+print("bins per pixel y: " + str(height / nPixelY))
 print("nMask " + str(nMask))
 
 simulated_psc_ref = calculate_phase_stepping_curve(nPixelX, nPixelY, nMask, nPhaseSteps, MC_signal_ref_NOP)
@@ -162,9 +171,7 @@ for nPixelCounterX in range(nPixelX):
 		fft_Ref = np.fft.fft(simulated_psc_ref[:, nPixelCounterY, nPixelCounterX]);
 		fft_Sam = np.fft.fft(simulated_psc_sam[:, nPixelCounterY, nPixelCounterX]);
 		absorption_signal[nPixelCounterY, nPixelCounterX] = 1.0 - np.real(fft_Sam[0]/fft_Ref[0]);
-		#phi = np.angle(fft_Sam[1]-fft_Ref[1]);
 		phi = np.angle(fft_Sam[1])-np.angle(fft_Ref[1]);
-		#check for phase wrapping
 		if phi < -np.pi:
 			differtial_phase_signal[nPixelCounterY, nPixelCounterX] = phi + np.ceil(-phi/(2.0*np.pi)) * 2.0 * np.pi;
 		elif phi > np.pi:
@@ -187,7 +194,7 @@ differtial_phase_signal = np.fliplr(differtial_phase_signal)
 
 print("############################################")
 print("Calculate Analytical absorption and differenetial phase profiles...")
-#analytical values (using MC medium constants (ICRU512))
+#analytical values (using EGSnrc medium constants (ICRU512))
 #cylinder radius
 Radius=0.087;#[cm]
 
@@ -195,11 +202,11 @@ Radius=0.087;#[cm]
 pixel_width_cm = FOV_x / nPixelX
 x_pixel_centers= np.linspace(-FOV_x/2.0 + pixel_width_cm / 2.0, FOV_x/2.0 - pixel_width_cm / 2.0, nPixelX);
 
-#MC data point coordinates (centers)
+#MC bins coordinates (centers)
 dp_width_in_cm = FOV_x/width
 x_data_point = np.linspace(-FOV_x / 2.0 + dp_width_in_cm / 2.0, FOV_x / 2.0 - dp_width_in_cm / 2.0 ,width)
 
-#get projected cylinder thickness in the center of the data points
+#get projected cylinder thickness in the center of the bins
 in_front_of_cylinder = np.less(x_data_point**2, Radius**2)
 projected_cylinder_thickness = np.zeros(width)
 projected_cylinder_thickness[in_front_of_cylinder] = 2.0 * np.sqrt(Radius**2 - x_data_point[in_front_of_cylinder]**2)
@@ -209,7 +216,7 @@ thy_abs_SI = np.exp(-mu_SI * projected_cylinder_thickness)
 thy_abs_POLY = np.exp(-mu_POLY * projected_cylinder_thickness)
 thy_abs_AIR = np.exp(-mu_AIR * projected_cylinder_thickness)
 
-#get the absorption signal as an avereage over the data points within one pixel
+#get the absorption signal as an avereage over the bins within one pixel
 reb_thy_abs_SI = np.mean(np.reshape(thy_abs_SI, (nPixelX, int(width/nPixelX))),axis=1)
 reb_thy_abs_POLY = np.mean(np.reshape(thy_abs_POLY, (nPixelX, int(width/nPixelX))),axis=1)
 reb_thy_abs_AIR = np.mean(np.reshape(thy_abs_AIR, (nPixelX, int(width/nPixelX))),axis=1)
@@ -231,9 +238,7 @@ thy_diff_phase_signal_POLY = np.zeros(width);
 thy_diff_phase_signal_SI[in_front_of_cylinder] = (delta_SI * 2.0 * np.pi * frac_talbot_dist * 4.0 / period_G2) * x_data_point[in_front_of_cylinder] / (projected_cylinder_thickness[in_front_of_cylinder])
 thy_diff_phase_signal_POLY[in_front_of_cylinder] = (delta_POLY * 2.0 * np.pi * frac_talbot_dist * 4.0 / period_G2) * x_data_point[in_front_of_cylinder] / (projected_cylinder_thickness[in_front_of_cylinder])
 
-#remove eventual infinities and NANs at edges
-#thy_diff_phase_signal_SI[np.isinf(thy_diff_phase_signal_SI)]=0
-#thy_diff_phase_signal_POLY[np.isinf(thy_diff_phase_signal_POLY)]=0
+#remove infinities and NANs at edges
 
 thy_diff_phase_signal_SI[np.isposinf(thy_diff_phase_signal_SI)]=np.pi
 thy_diff_phase_signal_POLY[np.isposinf(thy_diff_phase_signal_POLY)]=np.pi
@@ -258,7 +263,7 @@ thy_diff_phase_signal_POLY_reb[np.greater(thy_diff_phase_signal_POLY_reb, np.pi)
 thy_diff_phase_signal_POLY_reb[np.greater(-np.pi, thy_diff_phase_signal_POLY_reb)] = np.pi
 
 
-#remove eventual infinities and NANs at edges
+#remove infinities and NANs at edges
 thy_diff_phase_signal_SI[np.isinf(thy_diff_phase_signal_SI)]=0
 thy_diff_phase_signal_POLY[np.isinf(thy_diff_phase_signal_POLY)]=0
 
@@ -290,7 +295,7 @@ y_coordinate_range_for_average_abs_SI_lower = np.ones(10) * (FOV_y/2.0 - FOV_y/n
 
 
 
-print("Absorption projection - indicate areas for averaging the signal")
+print("Absorption projection - indicate areas for average")
 plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
 plt.imshow(np.clip(absorption_signal, a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
 #plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
@@ -359,7 +364,7 @@ plt.show()
 
 
 
-print("DPC projection - indicate areas for averaging the signal")
+print("DPC projection - indicate areas for average")
 plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
 plt.imshow(differtial_phase_signal, cmap='gray',extent=[-1,1,-0.5,0.5], vmin=-np.pi, vmax=np.pi, aspect="auto", interpolation='nearest')
 #plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
@@ -443,227 +448,3 @@ print("rmse_abs_SI: " + str(rmse_abs_SI))
 print("rmse_abs_POLY: " + str(rmse_abs_POLY))
 print("rmse_dpc_SI: " + str(rmse_dpc_SI))
 print("rmse_dpc_POLY: " + str(rmse_dpc_POLY))
-
-
-
-
-
-
-
-#not needed:
-print("Absorption projection - indicate areas for averaging the signal")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal, a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_coordinates, y_coordinate_range_for_average_abs_POLY_upper, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_coordinates, y_coordinate_range_for_average_abs_POLY_lower, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_coordinates, y_coordinates_SI, color='tab:orange', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_coordinates, y_coordinate_range_for_average_abs_SI_upper, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_coordinates, y_coordinate_range_for_average_abs_SI_lower, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-ax = plt.gca()
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2), fontsize=50)
-plt.yticks(fontsize=50)
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('y (mm)',fontsize=54)
-#name='ABS_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.14)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-
-
-
-
-
-
-#not needed form here
-y_coordinate_range_for_average_abs_POLY_upper = np.ones(2) * (FOV_y/2.0 - FOV_y/nPixelY/2.0 - int(13 + 9) * FOV_y/nPixelY)
-y_coordinate_range_for_average_abs_POLY_lower = np.ones(2) * (FOV_y/2.0 - FOV_y/nPixelY/2.0 - int(13 - 9) * FOV_y/nPixelY)
-y_coordinate_range_for_average_abs_SI_upper = np.ones(2) * (FOV_y/2.0 - FOV_y/nPixelY/2.0 - int(36 + 9) * FOV_y/nPixelY)
-y_coordinate_range_for_average_abs_SI_lower = np.ones(2) * (FOV_y/2.0 - FOV_y/nPixelY/2.0 - int(36 - 9) * FOV_y/nPixelY)
-
-
-print("Absorption projection - indicate areas for averaging the signal")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal, a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_POLY_upper, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_POLY_upper, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_POLY_lower, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_POLY_lower, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_coordinates, y_coordinates_SI, color='tab:orange', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_SI_upper, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_SI_upper, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_SI_lower, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_SI_lower, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-ax = plt.gca()
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2), fontsize=50)
-plt.yticks(fontsize=50)
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('y (mm)',fontsize=54)
-#name='ABS_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.14)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-
-
-
-print("Absorption projection - indicate areas for averaging the signal")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal, a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-#plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_POLY_upper, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_POLY_upper, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_POLY_lower, color='m', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_POLY_lower, color='m', marker="", linestyle='dashed',linewidth=2)
-#plt.plot(x_coordinates, y_coordinates_SI, color='tab:orange', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_SI_upper, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_SI_upper, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_left, y_coordinate_range_for_average_abs_SI_lower, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-plt.plot(x_border_for_average_right, y_coordinate_range_for_average_abs_SI_lower, color='tab:orange', marker="", linestyle='dashed',linewidth=2)
-ax = plt.gca()
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2), fontsize=50)
-plt.yticks(fontsize=50)
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('y (mm)',fontsize=54)
-#name='ABS_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.14)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-
-
-
-
-
-print("Absorption projection")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal, a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_coordinates, y_coordinates_SI, color='tab:orange', marker="", linestyle='solid',linewidth=2)
-ax = plt.gca()
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2), fontsize=50)
-plt.yticks(fontsize=50)
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('y (mm)',fontsize=54)
-#name='ABS_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.14)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-##
-
-#to here
-
-
-
-
-
-
-#not needed:
-print("DPC projection")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(differtial_phase_signal, cmap='gray',extent=[-1,1,-0.5,0.5], vmin=-np.pi, vmax=np.pi, aspect="auto", interpolation='nearest')
-ax = plt.gca()
-plt.plot(x_coordinates, y_coordinates_POLY, color='m', marker="", linestyle='solid',linewidth=2)
-plt.plot(x_coordinates, y_coordinates_SI, color='tab:orange', marker="", linestyle='solid',linewidth=2)
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2),fontsize=50)
-plt.yticks(fontsize=50)
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('y (mm)',fontsize=54)
-#name='DPC_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.14)
-#plt.savefig(name, bbox_inches = "tight")
-#plt.savefig("Absorption_projection_indicate_average.pdf", dpi=300, format="pdf")
-plt.show()
-##
-
-
-##
-
-
-print('absorption profile SI and POLY')
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.plot(10 * x_pixel_centers, reb_thy_abs_signal_POLY, color='k', marker="", linestyle='solid',linewidth=2)
-plt.plot(10 * x_pixel_centers, reb_thy_abs_signal_SI, color='k', marker="", linestyle='dashed', linewidth=2)
-plt.plot(10 * x_pixel_centers, absorption_signal[int(13),:], color='m', marker=".", linestyle='none')
-plt.plot(10 * x_pixel_centers, absorption_signal[int(36),:], color='tab:orange', marker=".", linestyle='none')
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2),fontsize=50)
-plt.yticks(fontsize=50)
-plt.grid()
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('Absorption signal',fontsize=54)
-#name='ABS_profile_SI_Poly_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.11)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-
-
-
-
-
-print("range for SI")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal[(int(36) - 9):(int(36) + 9),:], a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-plt.show()
-
-print("range for POLY")
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.imshow(np.clip(absorption_signal[(int(13) - 9):(int(13) + 9),:], a_min = 0.0, a_max = 1.0), cmap='gray',extent=[-1,1,-0.5,0.5], vmin=0, vmax=1.0, aspect="auto",interpolation='nearest')
-plt.show()
-
-print('absorption profile SI and POLY')
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.plot(10 * x_pixel_centers, reb_thy_abs_signal_POLY, color='k', marker="", linestyle='solid',linewidth=2)
-plt.plot(10 * x_pixel_centers, reb_thy_abs_signal_SI, color='k', marker="", linestyle='dashed', linewidth=2)
-plt.plot(10 * x_pixel_centers, averaged_MC_absorption_signal_POLY, color='m', marker=".", linestyle='none')
-plt.plot(10 * x_pixel_centers, averaged_MC_absorption_signal_SI, color='tab:orange', marker=".", linestyle='none')
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2),fontsize=50)
-plt.yticks(fontsize=50)
-plt.grid()
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('Absorption signal',fontsize=54)
-#name='ABS_profile_SI_Poly_' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.11)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-
-
-
-print('diff phase signal SI and POLY')
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.plot(10 * x_data_point, thy_diff_phase_signal_POLY,color='k', marker="", linestyle='solid',linewidth=2)
-plt.plot(10 * x_data_point, thy_diff_phase_signal_SI,color='k', marker="", linestyle='dashed',linewidth=2)
-plt.plot(10 * x_pixel_centers, differtial_phase_signal[int(13),:],color='m', marker=".", linestyle='none')
-plt.plot(10 * x_pixel_centers, differtial_phase_signal[int(36),:],color='tab:orange', marker=".", linestyle='none')
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2),fontsize=50)#([2.74, 4.11,5.49,6.86,8.23])
-plt.yticks(fontsize=50)
-plt.grid()
-plt.ylim((-3.5,3.5))
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('Differential phase signal',fontsize=54)
-#name='DPC_profile_SI_Poly' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.11)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()
-##
-
-
-#average the absorption signal over a few pixel rows
-averaged_MC_dp_signal_SI = np.mean(differtial_phase_signal[(int(36) - 9):(int(36) + 9),:], axis = 0)
-averaged_MC_dp_signal_POLY = np.mean(differtial_phase_signal[(int(13) - 9):(int(13) + 9),:], axis = 0)
-
-
-print('diff phase signal SI and POLY')
-plt.figure(figsize=(fig_width, fig_height), dpi = my_dpi)
-plt.plot(10 * x_data_point, thy_diff_phase_signal_POLY,color='k', marker="", linestyle='solid',linewidth=2)
-plt.plot(10 * x_data_point, thy_diff_phase_signal_SI,color='k', marker="", linestyle='dashed',linewidth=2)
-plt.plot(10 * x_pixel_centers, averaged_MC_dp_signal_POLY,color='m', marker=".", linestyle='none')
-plt.plot(10 * x_pixel_centers, averaged_MC_dp_signal_SI, color='tab:orange', marker=".", linestyle='none')
-plt.xticks(np.around(np.linspace(-1,1,5),decimals=2),fontsize=50)#([2.74, 4.11,5.49,6.86,8.23])
-plt.yticks(fontsize=50)
-plt.grid()
-plt.ylim((-3.5,3.5))
-plt.xlabel('x (mm)',fontsize=54)
-plt.ylabel('Differential phase signal',fontsize=54)
-#name='DPC_profile_SI_Poly' + str(nPixelX) + 'x' + str(nPixelY) + '_nP'+ str(nPhaseSteps) + '_nM' + str(nMask) + '.png'
-plt.subplots_adjust(bottom=0.11, top=0.96, right=0.96, left= 0.11)
-#plt.savefig(name, bbox_inches = "tight")
-plt.show()

@@ -2,7 +2,8 @@
 
 ###############################################################################
 #
-#   EGS_XGI Example_Usercode_Score_Energy run scripz
+#   Example run script for EGS_XGI applications
+#		Runs PW_Cylinder image simulations.
 #   Copyright (C) 2020  ETH Zürich
 #
 #   This file is part of the EGS_XGI - an X-ray grating interferometry
@@ -29,24 +30,26 @@
 #
 ###############################################################################
 
-
 export EGS_HOME=/path/to/egs_xgi_home/
 #if EGSnrc environment variables are not set globally:
 export HEN_HOUSE=/path/to//HEN_HOUSE/
 export EGS_CONFIG=/path/to/config/file
-export my_machine=my_machine_name
+export my_machine=set_my_machine_name
 
-n=250000000
+n=500000000
+
+
 
 cd ..
-the_dir=./PW_Cylinder_TestCases/
-for i in {1..3}
-do
-  input=2mmx1mmFOV_PlaneWave_Case_$i
-  echo $the_dir"/"$input".egsinp"
-  mv $the_dir"/"$input".egsinp" .
-  ../bin/$my_machine/Example_Usercode_Score_Energy -p 521icru_gi -i $input -r RefractiveIndexFile -n $n > $the_dir"/"$input".log"
-  mv $input".egsinp" $the_dir
-  wait
-done
+the_dir=./PW_Cylinder/
+input0=2mmx1mmFOV_PlaneWave_Cylinder_G12d0p5_0
+mv $the_dir"/"$input0".egsinp" .
+../bin/$my_machine/Example_Usercode -p 521icru -i $input0 -r RefractiveIndexFile -n $n > $the_dir"/"$input0".log"
+mv $input0".egsinp" $the_dir
+
+input1=2mmx1mmFOV_PlaneWave_Reference_G12d0p5_0
+mv $the_dir"/"$input1".egsinp" .
+../bin/$my_machine/Example_Usercode -p 521icru -i $input1 -r RefractiveIndexFile -n $n > $the_dir"/"$input1".log"
+mv $input1".egsinp" $the_dir
+
 exit 0
