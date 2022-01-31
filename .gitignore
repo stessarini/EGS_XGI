@@ -38,3 +38,6 @@ mortjob.mortran
 #ignore automatically generated folders
 egs_xgi_home/Example_Usercode/TalbotCarpet_comparison/Fourier_*/
 egs_xgi_home/Example_Usercode/TalbotCarpet_comparison/Huygens_*/
+
+#ignore operating system files
+.directory
