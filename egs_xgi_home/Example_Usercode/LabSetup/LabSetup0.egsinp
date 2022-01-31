@@ -1,0 +1,249 @@
+###############################################################################
+#
+#   Example input file for EGS_XGI - and EGSnrc
+#   Lab setup simulation
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
+###############################################
+###############################################
+##					     ##
+##		Geometry		     ##
+##					     ##
+###############################################
+###############################################
+
+:start geometry definition:
+
+################
+#
+# Start: Create wafers
+#
+################
+
+	###########
+	# Grating Wafer G0
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = Wafer_G0
+		x-planes= -0.5 0.5
+		y-planes= -0.005 0.005
+		z-planes= 4.978 5.0
+		:start media input:
+			media = SI521ICRU
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+
+	###########
+	# Grating Wafer G1
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = Wafer_G1
+		x-planes= -0.5 0.5
+		y-planes= -0.005 0.005
+		z-planes= 25.0775 25.1
+		:start media input:
+			media = SI521ICRU
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+
+
+################
+#
+# Stop: Create Wafers
+#
+################
+
+
+	############################################
+	# start Envelope containing everything
+	###########################################
+
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = base
+		x-planes= -0.505 0.505
+		y-planes= -0.00505 0.00505
+		z-planes= -6.0 85.4
+		:start media input:
+			media = AIR521ICRU
+			set medium = 1 0
+		:stop media input:
+	:stop geometry:
+	:start geometry:
+		library = egs_genvelope
+		name = simuGeom
+		base geometry = base
+		inscribed geometries = Wafer_G0 Wafer_G1
+	:stop geometry:
+	###########################################
+	# stop Envelope containing everything
+	###########################################
+
+	simulation geometry = simuGeom
+:stop geometry definition:
+
+###############################################
+###############################################
+##					     ##
+##		source           	     ##
+##					     ##
+###############################################
+###############################################
+:start source definition:
+
+
+
+	:start source:
+		library = egs_collimated_source
+		name = gaussian_source
+		:start source shape:
+			library = egs_gaussian_shape
+			:start shape:
+				type = point
+				position = 0 0 -5
+			:stop shape:
+			sigma = 0.0004246 #0.0006369
+		:stop source shape:
+		:start target shape:
+			library   = egs_rectangle
+			rectangle = -0.014 -0.000025 0.014 0.000025
+		:stop target shape:
+		distance = 5
+		charge = 0
+		:start spectrum:
+			type = tabulated spectrum
+			energies =  0.01  0.011  0.012  0.013  0.014  0.015  0.016  0.017  0.018  0.019  0.02  0.021  0.022  0.023  0.024  0.025  0.026  0.027  0.028  0.029  0.03  0.031  0.032  0.033  0.034  0.035  0.036  0.037  0.038  0.039  0.04  0.041
+			probabilities = 4.437995661681658904e-02 4.764742814870436688e-02 4.951928229267677645e-02 5.039431363363445354e-02 5.052983537739734465e-02 5.012325928304973977e-02 4.932991172646215838e-02 4.824028563960389149e-02 4.693288908610587090e-02 4.545907408060136101e-02 4.385757275001288952e-02 4.216006168266742127e-02 4.038555493014862885e-02 3.855087942464249795e-02 3.666867102173651527e-02 3.474917771964486368e-02 3.279963008751592135e-02 3.082539474740627478e-02 2.883111256904013694e-02 2.682049261697410855e-02 2.479643213260912873e-02 2.276149851103172542e-02 2.071727722716266984e-02 1.866533447707846224e-02 1.660692428997067108e-02 1.454310286062679772e-02 1.247471706611745848e-02 1.040243044455944552e-02 8.326830858456129442e-03 6.248410015625116033e-03 4.167576966187052333e-03 2.084681715733581030e-03
+			spectrum type = 3
+		:stop spectrum:
+	:stop source:
+
+
+	simulation source = gaussian_source
+:stop source definition:
+###############################################
+###############################################
+##					     ##
+##		Transport parameters         ##
+##					     ##
+###############################################
+###############################################
+
+:start MC transport parameter:
+
+	 Global ECUT = 1.0
+	# Global PCUT = 0.02
+
+:stop MC transport parameter:
+###############################################
+###############################################
+##					     ##
+##		run control		     ##
+##					     ##
+###############################################
+###############################################
+
+:start run control:
+	 ncase = 3000000#100000
+:stop run control:
+###############################################
+###############################################
+##					     ##
+##		Random Number Generator      ##
+##					     ##
+###############################################
+###############################################
+:start rng definition:
+	type = ranmar
+	initial seeds = 1815 8989
+:stop rng definition:
+
+###############################################
+###############################################
+##					     ##
+##		Splitting algorithm	     ##
+##                      		     ##
+###############################################
+###############################################
+:start splitting algorithm definition:
+	:start splitting algorithm:
+		type = DefaultSplittingAlgorithm										#splitting algorithm type
+		setup = SourceGrating PhaseGrating detectorMem1			#list OpticalElement names in order: from source to detector
+		source coherence = incoherent 											# incoherent or coherent
+	:stop splitting algorithm:
+
+	:start optical element:
+		name = SourceGrating																#name required for 'setup'
+		type = BinarySourceGratingFourierZPlane							#OpticalElement type
+		position = 5.0																			#z-position
+		transmission function norm a = 1.0									#transmission through slits
+		slit width = 0.00005 																#in [cm]
+		periodicity = 0.0001 																#in [cm]
+		highest zero = 2.0																	#direction limitation
+		number of paths = 600000														#half of number of splittings
+	:stop optical element:
+
+	:start optical element:
+		name = PhaseGrating
+		type = FourierSeriesZPlane
+		position = 25.1																			#z-position
+		phase shift at design energy = 1.0 									#in units of pi
+		duty cycle = 0.5
+		periodicity = 0.00015 															#in [cm]
+		highest fourier order = 9														#up to with F-coefficient
+		design energy = 0.020																#[MeV]
+		model attenuation = 1 															#0 false; 1 true
+		medium A = SI521ICRU																#required if model attenuation = 1
+		medium B = AIR521ICRU
+		grating thickness = 0.0025 													#[cm] required if model attenuation = 1
+		norm at design energy = 1.0 1.0 										#a b >= 0, needed if model attenuation = 0
+		direction correction = 0 														#0 false; 1 true
+	:stop optical element:
+
+
+
+	:start optical element:
+		name = detectorMem1
+		type = DetectorZPlaneMem
+		total signal pixels = 2680000 11										#Nx Ny
+		position = -0.25125 -0.0025 85.4										#x_min y_min z [cm]
+		height = 0.005																			#y_max - y_min [cm]
+		width = 0.5025																			#x_max - x_min [cm]
+		write to binary = 1																	#0 false; 1 true
+		write to pgm = 0																		#0 false; 1 true
+		history wise normalization = yes										#yes/no keeps scored weight conserved
+		number of paths normalization = no									#yes/no
+		count paths = no																		#count the number of paths in each pixel
+		save at = ./LabSetup/																#hast to exist prior to simulation
+		allowed to overwrite = yes													#enable(yes)/disable(no) over-writing in case 'save at' failed, which results in saving to standard location.
+	:stop optical element:
+:stop splitting algorithm definition:

@@ -1,0 +1,232 @@
+###############################################################################
+#
+#   Example input file for EGS_XGI - and EGSnrc
+#		Blocked double slit experiment simulation.
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
+###############################################
+###############################################
+##					     ##
+##		Geometry		     ##
+##					     ##
+###############################################
+###############################################
+
+:start geometry definition:
+	:start view control:
+		xmin = -0.002
+		xmax = 0.002
+		ymin = -0.003
+		ymax = 0.003
+		zmin = -0.003
+		zmax = 0.001
+	:stop view control:
+	###################################
+	###################################
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = WaverG0
+		x-planes= -0.007100 0.007100
+		y-planes= -0.000490 0.000490
+		z-planes= -0.0250 0.0
+		:start media input:
+			media = VACUUM
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = dummy
+		x-planes= -0.007100 0.007100
+		y-planes= -0.000490 0.000490
+		z-planes= 9.9750 10.0
+		:start media input:
+			media = SI521ICRU
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+
+
+	#block one slit...
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = Block
+		x-planes= -0.0001 0.007100
+		y-planes= -0.000400 0.000400
+		z-planes= 0.001 0.011
+		:start media input:
+			media = AU521ICRU
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+	############################################
+
+	############################################
+	# start Envelope containing everything
+	###########################################
+		:start geometry:
+			library = egs_ndgeometry
+			type = EGS_XYZGeometry
+			name = base
+			x-planes= -0.007200 0.007200
+			y-planes= -0.000500 0.000500
+			z-planes= -111 10
+			:start media input:
+				media = VACUUM
+				set medium = 1 0
+			:stop media input:
+		:stop geometry:
+		:start geometry:
+			library = egs_genvelope
+			name = simuGeom
+			base geometry = base
+			inscribed geometries = WaverG0 Block
+		:stop geometry:
+	###########################################
+	# stop Envelope containing everything
+	###########################################
+
+	simulation geometry = simuGeom
+:stop geometry definition:
+###############################################
+###############################################
+##					     ##
+##		source           	     ##
+##					     ##
+###############################################
+###############################################
+:start source definition:
+    :start source:
+        library = egs_collimated_source
+        name = my_source
+        :start source shape:
+            type = point
+            position = -0.0001 0 -100
+        :stop source shape:
+        :start target shape:
+		library   = egs_rectangle
+		rectangle = -0.00022 -0.00000118182 0.00002 0.00000118182
+		inner rectangle = -0.0002 -0.00000081818 0.0 0.00000081818
+        :stop target shape:
+        distance = 100
+        charge = 0
+        :start spectrum:
+            type = monoenergetic
+            energy = 0.017
+        :stop spectrum:
+    :stop source:
+
+    simulation source = my_source
+
+:stop source definition:
+
+###############################################
+###############################################
+##					     ##
+##		Transport parameters         ##
+##					     ##
+###############################################
+###############################################
+
+:start MC transport parameter:
+
+	 Global ECUT = 1.0
+	# Global PCUT = 0.02
+
+:stop MC transport parameter:
+
+
+###############################################
+###############################################
+##					     ##
+##		run control		     ##
+##					     ##
+###############################################
+###############################################
+
+:start run control:
+	 ncase = 3000000#100000
+:stop run control:
+###############################################
+###############################################
+##					     ##
+##		Random Number Generator      ##
+##					     ##
+###############################################
+###############################################
+:start rng definition:
+	type = ranmar
+	initial seeds = 97 42
+:stop rng definition:
+
+###############################################
+###############################################
+##					     ##
+##		Splitting algorithm	     ##
+##                      		     ##
+###############################################
+###############################################
+:start splitting algorithm definition:
+	:start splitting algorithm:
+		type = DefaultSplittingAlgorithm
+		main detector = detector1
+		setup = SourceGrating detector1
+		source coherence = coherent # incoherent coherent
+	:stop splitting algorithm:
+
+	:start optical element:
+		name = SourceGrating
+		type = BinarySourceGratingFourierZPlane
+		position = 0.0
+		transmission function norm a = 1.0
+		slit width =  0.00002 #in [cm]
+		periodicity = 0.00022 #in [cm]
+		highest zero = 5.0
+		number of paths = 18000 #20000
+	:stop optical element:
+
+
+	 :start optical element:
+		name = detector1
+		type = DetectorZPlane
+		total signal pixels = 13392 5#28000
+		history signal pixels = 13392 5#28000
+		position = -0.0072 -0.000133238 10.0
+		height = 0.000266476
+		width = 0.0144 #0.000266476
+		write to binary = 1
+		write to pgm = 0
+		count number of paths = yes
+		save at = ./DoubleSlitExperiment/
+		allowed to overwrite = yes
+	:stop optical element:
+
+:stop splitting algorithm definition:

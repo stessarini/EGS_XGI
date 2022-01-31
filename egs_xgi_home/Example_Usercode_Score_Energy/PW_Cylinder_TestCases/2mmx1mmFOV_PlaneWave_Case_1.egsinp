@@ -1,0 +1,266 @@
+###############################################################################
+#
+#   EGS_XGI Example_Usercode_Score_Energy sample input file.
+#   Copyright (C) 2020  ETH Zürich
+#
+#   This file is part of the EGS_XGI - an X-ray grating interferometry
+#   extension for EGSnrc.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU Affero General Public License as published
+#   by the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU Affero General Public License for more details.
+#
+#   You should have received a copy of the GNU Affero General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###############################################################################
+#
+#   Author:     Stefan Tessarini
+#
+#
+#
+###############################################################################
+
+
+###############################################
+###############################################
+##					     ##
+##		Geometry		     ##
+##					     ##
+###############################################
+###############################################
+
+:start geometry definition:
+	:start view control:
+		xmin = -0.002
+		xmax = 0.002
+		ymin = -0.003
+		ymax = 0.003
+		zmin = -0.003
+		zmax = 0.001
+	:stop view control:
+	###################################
+	###################################
+	# Grating Wafer
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = Wafer
+		x-planes= -0.1005 0.1005
+		y-planes= -0.0505 0.0505
+		z-planes= -0.0250 0.0
+		:start media input:
+			media = SI521ICRU
+			set medium = 0 0
+		:stop media input:
+	:stop geometry:
+	############################################
+	:start geometry:
+		name        = planes
+		library     = egs_planes
+		type        = EGS_Yplanes
+		positions   = -0.045 0 0.045
+        # No media required
+	:stop geometry:
+
+	:start geometry:
+		name        = SI_Cylinder
+		library     = egs_cylinders
+		type        = EGS_YCylinders
+		radii       = 0.087
+		:start media input:
+			media = SI521ICRU
+			set medium = 1 0
+		:stop media input:
+	:stop geometry:
+
+	:start geometry:
+		name        = POLY_Cylinder
+		library     = egs_cylinders
+		type        = EGS_YCylinders
+		radii       = 0.087
+		:start media input:
+			media = POLYSTY521ICRU
+			set medium = 1 0
+		:stop media input:
+	:stop geometry:
+
+    # The composite geometry
+	:start geometry:
+		name            = sample
+		library         = egs_cdgeometry
+		base geometry   = planes
+		# set geometry = 1 geom means:
+		# "in region 1 of the basegeometry, use geometry "geom"
+		set geometry   = 0 SI_Cylinder
+		set geometry   = 1 POLY_Cylinder
+        	# The final region numbers are attributed by the cd geometry object;
+        	# Use the viewer to determine region numbers
+	:stop geometry:
+
+	:start geometry:
+		name        = Shifted_Sample
+		library     = egs_gtransformed
+		my geometry = sample
+		:start transformation:
+			translation = 0 0 0.09
+			#rotation    = 0.5 0 -1
+			## rotation is first!
+		:stop transformation:
+	:stop geometry:
+
+	############################################
+	# start Envelope containing everything
+	###########################################
+
+	:start geometry:
+		library = egs_ndgeometry
+		type = EGS_XYZGeometry
+		name = base
+		x-planes= -0.101 0.101
+		y-planes= -0.051 0.051
+		z-planes= -0.250 2.41966
+		:start media input:
+			media = AIR521ICRU
+			set medium = 1 0
+		:stop media input:
+	:stop geometry:
+	:start geometry:
+		library = egs_genvelope
+		name = simuGeom
+		base geometry = base
+		inscribed geometries = Wafer Shifted_Sample
+	:stop geometry:
+	###########################################
+	# stop Envelope containing everything
+	###########################################
+
+	simulation geometry = simuGeom
+:stop geometry definition:
+
+###############################################
+###############################################
+##					     ##
+##		source           	     ##
+##					     ##
+###############################################
+###############################################
+:start source definition:
+	:start source:
+		library = egs_parallel_beam
+		 name = PerfectPlaneWaveSource
+		:start shape:
+		library = egs_rectangle
+		rectangle = -0.100 -0.05 0.1 0.05
+		:stop shape:
+			direction 0 0 1
+			charge = 0
+		:start spectrum:
+			type = monoenergetic
+			energy = 0.02
+		:stop spectrum:
+	:stop source:
+
+	 :start source:
+		library = egs_transformed_source
+		name = TransformedPlaneWaveSource
+		source name = PerfectPlaneWaveSource
+		:start transformation:
+			translation = 0 0 -0.249
+		:stop transformation:
+	:stop source:
+
+	simulation source = TransformedPlaneWaveSource
+:stop source definition:
+###############################################
+###############################################
+##					     ##
+##		Transport parameters         ##
+##					     ##
+###############################################
+###############################################
+
+:start MC transport parameter:
+
+	 Global ECUT = 1.0
+	# Global PCUT = 0.02
+
+:stop MC transport parameter:
+###############################################
+###############################################
+##					     ##
+##		run control		     ##
+##					     ##
+###############################################
+###############################################
+
+:start run control:
+	 ncase = 3000000#100000
+:stop run control:
+###############################################
+###############################################
+##					     ##
+##		Random Number Generator      ##
+##					     ##
+###############################################
+###############################################
+:start rng definition:
+	type = ranmar
+	initial seeds = 97 42
+:stop rng definition:
+
+###############################################
+###############################################
+##					     ##
+##		Splitting algorithm	     ##
+##                      		     ##
+###############################################
+###############################################
+:start splitting algorithm definition:
+	:start splitting algorithm:
+		type = DefaultSplittingAlgorithm
+		setup = PhaseGrating detector1
+		source coherence = coherent # incoherent coherent
+	:stop splitting algorithm:
+
+	:start optical element:
+		name = PhaseGrating
+		type = FourierSeriesZPlane
+		position = 0.0
+		phase shift at design energy = 1.0 #in units of pi
+		duty cycle = 0.5
+		periodicity = 0.0002 #in [cm]
+		highest fourier order = 5
+		design energy = 0.020
+		Epsilon = 0.000001
+		model attenuation = 1 #0 false; 1 true
+		medium A = SI521ICRU
+		medium B = AIR521ICRU
+		grating thickness = 0.0025
+		norm at design energy = 1.0 1.0 #if constant set for a , b sections: >= 0
+		direction correction = 1 #0 false; 1 true
+	:stop optical element:
+
+	:start optical element:
+	 name = detector1
+	 type = DetectorZPlane
+	 total signal pixels = 20000 10000
+	 position = -0.1 -0.05 2.41966
+	 height = 0.1
+	 width = 0.2
+	 write to binary = 1
+	 write to pgm = 0
+	 count number of paths = yes
+	 save at = ./PW_Cylinder_5e8/
+	 allowed to overwrite = yes
+	 generate secondary signal file = yes
+	 history wise normalization = yes
+ :stop optical element:
+
+:stop splitting algorithm definition:
