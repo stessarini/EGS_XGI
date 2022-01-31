@@ -1,5 +1,5 @@
 # EGS_XGI
-EGS_XGI is a c++ extension for EGSnrc (doi:10.4224/40001303) for Monte Carlo (MC) simulation of X-ray grating interferometry as published in S. Tessarini et al. (accepted Scientific Reports). 
+EGS_XGI is a c++ extension for EGSnrc (doi:10.4224/40001303) for Monte Carlo (MC) simulation of X-ray grating interferometry as published in S. Tessarini et al. Semi-classical Monte Carlo algorithm for the simulation of X-ray grating interferometry. 
 EGS_XGI adds diffraction effects to EGSnrc MC photon transport enabling simultaneous simulation of interference and scattering effects such as deposited energy. If properly installed EGS_XGI does not replace nor influence EGSnrc installations similar to a c++ EGSnrc usercode. For performing conventional EGSnrc simulations after the installation of EGS_XGI simply use the EGSnrc Makefiles and classes delivered by EGSnrc.
 
 
@@ -38,7 +38,7 @@ The usercodes can be compiled by:
 - then use the make command in the terminal.
 
 ## Run simulations:
-A few example input files to reproduce the results in S. Tessarini et al. Are provided in the subfolders in Example_Usercode/ and  Example_Usercode_Score_Energy/. The simulations can be executed in the terminal by e.g. cd into your egs_xgi_home:
+A few example input files to reproduce the results shown in the publication (S. Tessarini et al.) are provided in the subfolders in Example_Usercode/ and  Example_Usercode_Score_Energy/. The simulations can be executed in the terminal by e.g. cd into your egs_xgi_home:
 cd your_path_to/egs_xgi_home/Example_Usercode/DoubleSlit/
 
 open the run script, e.g. with vi:
