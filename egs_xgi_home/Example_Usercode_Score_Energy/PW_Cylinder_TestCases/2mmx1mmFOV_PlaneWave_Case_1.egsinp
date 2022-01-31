@@ -257,7 +257,7 @@
 	 write to binary = 1
 	 write to pgm = 0
 	 count number of paths = yes
-	 save at = ./PW_Cylinder_5e8/
+	 save at = ./PW_Cylinder_TestCases/
 	 allowed to overwrite = yes
 	 generate secondary signal file = yes
 	 history wise normalization = yes
