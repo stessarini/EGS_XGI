@@ -26,6 +26,14 @@ mortjob.mortran
 
 #ignore EGSnrc input files
 *.egsinp
+!DoubleSlit_d2em4_a2em5_CohPointSource_OneBlockedSlit.egsinp
+!DoubleSlit_d2em4_a2em5_CohPointSource.egsinp
+!LabSetup_NoG_0.egsinp
+!LabSetup0.egsinp
+!2mmx1mmFOV_PlaneWave_Cylinder_G12d0p5_0
+!2mmx1mmFOV_PlaneWave_Reference_G12d0p5_0
+!Carpet_G14d0p5_F41_20keV_Sim_1_example
+!2mmx1mmFOV_PlaneWave_Case_*.egsinp
 
 #ignore automatically generated folders
 egs_xgi_home/Example_Usercode/TalbotCarpet_comparison/Fourier_*/
