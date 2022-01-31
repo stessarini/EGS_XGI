@@ -2,7 +2,7 @@
 EGS_XGI is a c++ extension for EGSnrc (doi:10.4224/40001303) for Monte Carlo (MC) simulation of X-ray grating interferometry as published in S. Tessarini et al. Semi-classical Monte Carlo algorithm for the simulation of X-ray grating interferometry. 
 EGS_XGI adds diffraction effects to EGSnrc MC photon transport enabling simultaneous simulation of interference and scattering effects such as deposited energy. If properly installed EGS_XGI does not replace nor influence EGSnrc installations similar to a c++ EGSnrc usercode. For performing conventional EGSnrc simulations after the installation of EGS_XGI simply use the EGSnrc Makefiles and classes delivered by EGSnrc.
 
-
+[![DOI](https://zenodo.org/badge/454138564.svg)](https://zenodo.org/badge/latestdoi/454138564)
 
 ## License:
 EGS_XGI is distributed as free software under the terms of the GNU Affero General Public License. Please consider the license before downloading the software.
